@@ -24,31 +24,40 @@ Function  finding  maximum  value  in a zero  terminated  integer  array
 findMax:
 PUSH     {lr}
 
-	
 	MOV r3, #0
 
+
 again:
+	/* Check if it's 0 */
 	LDR r2, [r0]
 	CMP r2, #0
 	BEQ finish
 
-	CMP r2, r3
+	/* Check value if it's less than... */
+	CMPS r2, r3
 	BLT jump
 
+	/* Set the new max value */
 	MOV r3, r2
 
+
 jump:
+	/* Move in memory 4 bytes */
 	ADD r0, #4
 	BAL again
 
+
 finish:
+	/* Store max value and exit function */
 	STR r3, [r0]
 
+
+POP	{pc}
 
 
 /* Add  code to find  maximum  value  element  here! */
 /* Any  registers  altered  by the  function  beside r0 -r3 must be  preserved  */
-POP      {pc}
+/*	POP	{pc} */
 
 /**********************
 main  function
