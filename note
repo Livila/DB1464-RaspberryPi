@@ -1,0 +1,3 @@
+s -o main.o main.s && gcc -g -o main main.o && gdb main
+http://cessa.khu.ac.ir/wp-content/uploads/2015/12/Computer-Organization-and-Design-5th-Edition-Patterson-Hennessy.pdf
+irq
