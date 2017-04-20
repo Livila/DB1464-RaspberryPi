@@ -33,12 +33,24 @@ POP	{pc}
 main:
 PUSH	{lr}
 
-	MOV	r0, #4
+
+	LDR r4, =list
+
+loop:
+	LDR r0, [r4]
+	CMP r0, #0
+	BEQ endProgram
+
 	BL	factorial
 	MOV	r1, r0
 	LDR	r0, =printText
 	BL	printf
 
+	ADD r4, #4
+	BL loop
+
+
+endProgram:
 
 
 	/* Return 0 at the end of the program. */
