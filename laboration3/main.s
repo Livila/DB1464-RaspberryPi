@@ -12,23 +12,21 @@ printText: .asciz "Factorial: %d\n"
 factorial:
 
 PUSH	{lr}
-/*
+
 again:
 	MOV r1, #1
 
-	LDR r2, [r0]
-
-	CMP r2, #0
+	CMP r0, #0
 	BEQ finish
-	STR r2, [r0]
-	BL factorial
+
+doFactoring:
+	MUL r1, r1, r0
+	SUB r0, r0, #1
+	CMP r0, #0
+	BNE doFactoring
 
 finish:
-	MUL r2, r1
-	MOV r0, r2
-*/
-
-	MOV r0, #3
+	MOV r0, r1
 
 POP	{pc}
 
