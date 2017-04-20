@@ -2,7 +2,7 @@
 list:
 	.word	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0
 
-printText: .asciz "Factorial: %d\n"
+printText: .asciz "Factorial %d: %d\n"
 
 .text
 .global main
@@ -42,7 +42,8 @@ loop:
 	BEQ endProgram
 
 	BL	factorial
-	MOV	r1, r0
+	LDR	r1, [r4]
+	MOV	r2, r0
 	LDR	r0, =printText
 	BL	printf
 
