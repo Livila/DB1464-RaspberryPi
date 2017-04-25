@@ -13,17 +13,14 @@ factorial:
 
 PUSH	{lr}
 
-again:
-	MOV r1, #1
 
 	CMP r0, #0
 	BEQ finish
 
-doFactoring:
 	MUL r1, r1, r0
 	SUB r0, r0, #1
-	CMP r0, #0
-	BNE doFactoring
+
+	BL factorial
 
 finish:
 	MOV r0, r1
@@ -39,6 +36,7 @@ PUSH	{lr}
 loop:
 	LDR r0, [r4]
 	CMP r0, #0
+	MOV r1, #1
 	BEQ endProgram
 
 	BL	factorial
