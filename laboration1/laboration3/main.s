@@ -39,6 +39,9 @@ loop:
 	MOV r1, #1
 	BEQ endProgram
 
+/*	Final test:
+	MOV r0, #0
+*/
 	BL	factorial
 	LDR	r1, [r4]
 	MOV	r2, r0
