@@ -2,8 +2,8 @@
 #include <linux/kernel.h>		// Needed for KERN_INFO
 #include <linux/interrupt.h>	// Needed for register_irq
 
-#define IRQ1 0	// Byt ut 0 mot IRQ för knapp som räknar upp
-#define IRQ2 0	// Byt ut 0 mot IRQ för knapp som räknar ner
+#define IRQ1 176	// Byt ut 0 mot IRQ för knapp som räknar upp
+#define IRQ2 175	// Byt ut 0 mot IRQ för knapp som räknar ner
 
 /*
  * Enables access to the gpio
@@ -36,6 +36,7 @@ static int __init btnrpi_init(void)
 		free_irq(IRQ2,NULL);
 		return -EINVAL;
 	}
+
 	printk(KERN_INFO "COUNTER - Driver initialized.\n");
 	return 0;
 }
@@ -48,14 +49,15 @@ static void __exit btnrpi_exit(void)
 	printk(KERN_INFO "COUNTER - Unloading driver\n");
 	setdown();
 	// free irqs
-	free_irq(IRQ1, NULL);	
-	free_irq(IRQ2, NULL);	
-	
+	free_irq(IRQ1, NULL);
+	free_irq(IRQ2, NULL);
+
 }
 
 MODULE_LICENSE("GPLv3");
 MODULE_DESCRIPTION("Linux LED driver");
-MODULE_AUTHOR("ERA NAMN HÄR");
+MODULE_AUTHOR("Jonathan Ström och Felix Kozma");
 
 module_init(btnrpi_init);
 module_exit(btnrpi_exit);
+
