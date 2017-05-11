@@ -1,4 +1,4 @@
-.data
+
 /*
 ** Variabler här
 */
@@ -6,8 +6,8 @@ format: .asciz	"Value: 0x%x\n"	// Formatsträng som i printf()
 formatDown: .asciz	"ValueDown: %d\n"	// Formatsträng som i printf()
 formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
 tmp:   .word	0		// Variabeln tmp initierad till 0
-GPIO_List:	.word	17, 18, 21, 22, 10 // Array of variables.
-GPIO_NR:	.word	0
+gpio_list:	.word	17, 18, 21, 22, 9, 10 // Array of variables.
+gpio_curr_nr:	.word	0
 gpio_addr:	.word	0
 
 .text
@@ -68,8 +68,43 @@ setup:
 PUSH	{r4, r5, r6, lr}
 	BL setGPIO_addr
 
+	// Load gpio address
+	LDR r5, =gpio_addr
+	LDR r5, [r5]
+
+	// Load list of gpio nr
+	LDR r4, =gpio_list
+
+loop:
+	LDR r0, [r4] // Load value from list
+	CMP r0, #9
+	BEQ next
+
+	MOV r1, #10 // Divide by 10
+	BL idiv // r0 = kvoten, r1 = resten
+	MOV r3, #4
+	MUL r0, r3
+	LDR r0, [r0]
+	ADD r2, r0, r5
+
+	MOV r3, #3
+	MUL r1, r3
+	LSR r1, #1
+
+	LDR r1, [r1]
+	ORR r0, r1
+	STR r0, [r6]		//Tvärtom, alltså r4 till addressen i r8.
 
 
+	MOV r1, r0
+	LDR	r0, =format	// Laddar adressen till format
+	BL printk
+
+
+	ADD r4, #4
+	BL loop
+next:
+	
 
 
 
