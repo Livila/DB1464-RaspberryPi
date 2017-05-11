@@ -8,6 +8,7 @@ formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
 tmp:   .word	0		// Variabeln tmp initierad till 0
 GPIO_List:	.word	17, 18, 21, 22, 10 // Array of variables.
 GPIO_NR:	.word	0
+gpio_addr:	.word	0
 
 .text
 /*
@@ -65,11 +66,10 @@ POP     {pc}
 .GLOBAL setup
 setup:
 PUSH	{r4, r5, r6, lr}
-	MOV r0, #0
-	BL getGPIOAddr
-	MOV r4, r0
+	BL setGPIO_addr
 
-loop:
+
+
 
 
 
@@ -175,7 +175,10 @@ loop:
 	MOV r4, r5
 */
 
-	MOV r1, r0
+	//MOV r1, r0
+	LDR r1, =gpio_addr
+	LDR r1, [r1]
+
 	LDR	r0, =format	// Laddar adressen till format
 	//LDR	r1, =tmp		// Laddar adressen till tmp
 	//LDR	r1, [r1]		// Laddar värdet av tmp
@@ -184,7 +187,7 @@ loop:
 
 POP	{r4, r5, r6, pc}
 
-getGPIOAddr:
+setGPIO_addr:
 PUSH {r4, r5, r6, r7, r8, lr}
 
 	LDR r4, =0x3F200000
@@ -198,9 +201,10 @@ PUSH {r4, r5, r6, r7, r8, lr}
 	ADD r0, r7, r6		//  (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000)
 
 	LDR r8, =0xF0000000
-	ADD r0, r0, r8		// (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000) + 0xF0000000)
+	ADD r4, r0, r8		// (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000) + 0xF0000000)
 
-	STR r0, [r0]
+	LDR r0, =gpio_addr
+	STR r4, [r0]
 
 
 POP {r4, r5, r6, r7, r8, pc}
