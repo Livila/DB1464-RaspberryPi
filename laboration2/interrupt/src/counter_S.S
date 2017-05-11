@@ -2,10 +2,12 @@
 /*
 ** Variabler här
 */
-format: .asciz	"Value: %d\n"	// Formatsträng som i printf()
+format: .asciz	"Value: 0x%x\n"	// Formatsträng som i printf()
 formatDown: .asciz	"ValueDown: %d\n"	// Formatsträng som i printf()
 formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
 tmp:   .word	0		// Variabeln tmp initierad till 0
+GPIO_List:	.word	17, 18, 21, 22, 10 // Array of variables.
+GPIO_NR:	.word	0
 
 .text
 /*
@@ -62,31 +64,61 @@ POP     {pc}
  */
 .GLOBAL setup
 setup:
-PUSH	{r6, r7, lr}
+PUSH	{r4, r5, r6, lr}
+	MOV r0, #0
+	BL getGPIOAddr
+	MOV r4, r0
+
+loop:
+
+
+
+
 
 
 //GPIO_NR till output
-	MOV r0, #0 //Reset r0
+/*
+	MOV r0, #0			//Reset r0
 	LDR r0, =#0xf3200000
 	ADD r6, #4
 	LDR r0, [r6]
 	ORR r0, #8
 	STR r0, [r6]		//Tvärtom, alltså r4 till addressen i r8.
+*/
+
 
 // Sätta en GPIO pin till input
+/*
 	MOV r0, #0
 	LDR r0, =#0xf3200000
 	ADD r7, #4
 	LDR r0, [r7]
-
 	AND r0, #8
-	//MOV r0, [r7]
-	//AND r0, r7
-
 	STR r0, [r7]
+*/
+
 
 // Sätta en output till högt läge, 1.
-	
+/*
+	MOV r0, #0
+	LDR r0, =#0xf3200000
+	ADD r7, #0x1c
+	LDR r0, [r7]
+	ADD r0, #400
+	STR r0, [r7]
+*/
+
+
+// För att sätta en output-pin till lågt läge används följande:
+/*
+	MOV r0, #0
+	LDR r0, =#0xf3200000
+	ADD r6, #28
+	LDR r0, [r6]
+	ADD r0, #0x1c
+	STR r0, [r6]
+*/
+
 
 
 
@@ -142,21 +174,40 @@ PUSH	{r6, r7, lr}
 	MOV r5, #66
 	MOV r4, r5
 */
-	LDR	r0,=format	// Laddar adressen till format
-	LDR	r1,=tmp		// Laddar adressen till tmp
-	//LDR	r1,[r4]		// Laddar värdet av tmp
+
+	MOV r1, r0
+	LDR	r0, =format	// Laddar adressen till format
+	//LDR	r1, =tmp		// Laddar adressen till tmp
+	//LDR	r1, [r1]		// Laddar värdet av tmp
 	BL printk
 
 
-POP	{r6, r7, pc}
+POP	{r4, r5, r6, pc}
 
+getGPIOAddr:
+PUSH {r4, r5, r6, r7, r8, lr}
+
+	LDR r4, =0x3F200000
+	LDR r5, =0x00FFFFFF
+	AND r6, r4, r5			// (((addr) & 0x00FFFFFF)
+
+	LDR r5, =0x0F000000
+	LSR r4, #4			// (((addr) >> 4)
+	AND r7, r4, r5		// ((addr) & 0x00FFFFFF) + (((addr) >> 4)
+
+	ADD r0, r7, r6		//  (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000)
+
+	LDR r8, =0xF0000000
+	ADD r0, r0, r8		// (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000) + 0xF0000000)
+
+	STR r0, [r0]
+
+
+POP {r4, r5, r6, r7, r8, pc}
 /*
 ** Ta bort åtkomst till GPIO
 */
 .GLOBAL setdown
 setdown:
-	MOV r5, #0
-	MOV r4, #0
-	MOV r0, #0
-	MOV r1, #0
+
 
