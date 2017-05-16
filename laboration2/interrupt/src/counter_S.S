@@ -11,6 +11,20 @@ gpio_curr_nr:	.word	0
 gpio_addr:	.word	0
 
 .text
+
+//Ej testad
+/*
+short_wait:
+	MOV r0, #150
+	whileWait:
+		ADD r0, r0, #2
+		SUB r0, r0, #3
+		BNE whileWait
+bx lr
+	
+*/
+
+
 /*
 ** Division
 */
@@ -105,6 +119,28 @@ loop:
 	BL loop
 next:
 	
+
+//Ej testad
+/*
+LDR r5, =gpio_addr
+LDR r5, [r5]
+pullUp:
+LDR r0, [r4]
+LDR r0, r0	
+CMP r0, #0
+BEQ awzomeName
+	
+	ADD r2, r5, #152
+	LSL r1, r0, #1
+	//Dividera innan LSL
+	LDR r1, [r2]  //?
+	
+	
+ADD r4, #4
+//wait?
+BL pullUp
+awzomeName:
+*/
 
 
 
@@ -248,5 +284,17 @@ POP {r4, r5, r6, r7, r8, pc}
 */
 .GLOBAL setdown
 setdown:
+
+//Ej testad
+//återställer pull up läget
+/*
+LDR r0, =gpio_addr
+LDR r0, [r0]
+ADD  r0, #148
+MOV r1, #0
+LDR  r1, [r0]
+SUB r0, #4
+LDR r1, [r0]
+*/
 
 
