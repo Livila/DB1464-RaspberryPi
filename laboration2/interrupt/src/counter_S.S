@@ -32,19 +32,19 @@ bx lr
 idiv:
 	/* r0 innehåller N */
 	/* r1 innehåller D */
-	mov r2, r1
-	mov r1, r0
-	mov r0, #0
-	b .Lloop_check
+	MOV r2, r1
+	MOV r1, r0
+	MOV r0, #0
+	B .Lloop_check
 	.Lloop:
-		add r0, r0, #1
-		sub r1, r1, r2
+		ADD r0, r0, #1
+		SUB r1, r1, r2
 	.Lloop_check:
-		cmp r1, r2
-		bhs .Lloop
+		CMP r1, r2
+		BHS .Lloop
 	/* r0 innehåller kvoten */
 	/* r1 innehåller resten */
-	bx lr
+	BX lr
 
 /*
 ** Avbrottsrutin som kallas när ett interrupt sker. Ska räkna uppåt
