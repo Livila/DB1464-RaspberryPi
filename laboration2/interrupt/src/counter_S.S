@@ -1,4 +1,4 @@
-
+.data
 /*
 ** Variabler här
 */
@@ -80,6 +80,7 @@ POP     {pc}
 .GLOBAL setup
 setup:
 PUSH	{r4, r5, r6, lr}
+	
 	BL setGPIO_addr
 
 	// Load gpio address
@@ -96,24 +97,28 @@ loop:
 
 	MOV r1, #10 // Divide by 10
 	BL idiv // r0 = kvoten, r1 = resten
+
+
+	// (gpio_addr + (4*(GPIO_NR/10)))
 	MOV r3, #4
 	MUL r0, r3
-	LDR r0, [r0]
 	ADD r2, r0, r5
 
+	// (1<<(((GPIO_NR)%10)*3)
 	MOV r3, #3
 	MUL r1, r3
 	LSR r1, #1
 
-	LDR r1, [r1]
-	ORR r0, r1
-	STR r0, [r6]		//Tvärtom, alltså r4 till addressen i r8.
+	LDR r3, [r2]
+	ORR r3, r3, r1
+
+	STR r3, [r2]		//Tvärtom, från VL till HL
 
 
-	MOV r1, r0
-	LDR	r0, =format	// Laddar adressen till format
+	// Print info
+	MOV r1, r3
+	LDR	r0, =format
 	BL printk
-
 
 	ADD r4, #4
 	BL loop
@@ -247,6 +252,7 @@ awzomeName:
 */
 
 	//MOV r1, r0
+/*
 	LDR r1, =gpio_addr
 	LDR r1, [r1]
 
@@ -254,7 +260,7 @@ awzomeName:
 	//LDR	r1, =tmp		// Laddar adressen till tmp
 	//LDR	r1, [r1]		// Laddar värdet av tmp
 	BL printk
-
+*/
 
 POP	{r4, r5, r6, pc}
 
