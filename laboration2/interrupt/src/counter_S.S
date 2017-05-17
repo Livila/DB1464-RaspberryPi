@@ -143,8 +143,48 @@ POP	{r4, r5, r6, pc}
 
 setHigh:
 PUSH	{r4, r5, r6, lr}
-	
-	
+
+	LDR r5, =gpio_addr
+	LDR r5, [r5]
+	LDR r4, =gpio_list
+
+setHighLoop:
+	LDR r0, [r4]
+	CMP r0, #9
+	BEQ endHighLoop
+
+	MOV r1, #32
+	BL idiv
+
+	ADD r0, #7
+	MOV r2, #4
+	MUL r0, r2
+	ADD r0, r5	// Add gpio address
+
+	MOV r3, #1
+	LSL r3, r1
+
+	STR r3, [r0]
+
+PUSH	{r0, r1}
+	// Print info
+	MOV r1, r3
+	LDR	r0, =format
+	BL printk
+POP		{r0, r1}
+
+	ADD r4, #4
+	BL setHighLoop
+
+
+/*
+	ADD r6, r5, #0x1c
+	LDR r0, [r6]
+	ADD r0, #20000
+	STR r0, [r6]
+*/
+
+endHighLoop:
 
 POP		{r4, r5, r6, pc}
 
