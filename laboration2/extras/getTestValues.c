@@ -21,8 +21,8 @@ int main( int argc, const char* argv[] )
 
 	printf("(gpio_addr+ (4*(GPIO_NR/10))) |= (1<<(((GPIO_NR)%%10)*3): %x\n", (gpio_addr + (4*(GPIO_NR/10))) + (1<<(((GPIO_NR)%10)*3)));
 
-	printf("4*(7 + (GPIO_NR/32))): %x\n", 4*(7 + (GPIO_NR/32)));
-	printf("(4*(10 + (GPIO_NR/32)))): %x\n", 4*(10 + (GPIO_NR/32)));
+	printf("(4*(7 + (GPIO_NR/32))): %x\n", 4*(7 + (GPIO_NR/32)));
+	printf("(4*(10 + (GPIO_NR/32))): %x\n", 4*(10 + (GPIO_NR/32)));
 
 	printf("(1 << (GPIO_NR %% 32)): %x\n", 1 << (GPIO_NR % 32));
 
