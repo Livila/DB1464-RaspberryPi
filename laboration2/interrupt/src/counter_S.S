@@ -74,15 +74,29 @@ PUSH    {lr}
 
 POP     {pc}
 
-/*
- * Sätt upp åtkomst till GPIO-pinnarnas minne
- */
-.GLOBAL setup
-setup:
-PUSH	{r4, r5, r6, lr}
-	
-	BL setGPIO_addr
+setGPIO_addr:
+PUSH	{r4, r5, r6, r7, r8, lr}
 
+	LDR r4, =0x3F200000
+	LDR r5, =0x00FFFFFF
+	AND r6, r4, r5			// (((addr) & 0x00FFFFFF)
+
+	LDR r5, =0x0F000000
+	LSR r4, #4			// (((addr) >> 4)
+	AND r7, r4, r5		// ((addr) & 0x00FFFFFF) + (((addr) >> 4)
+
+	ADD r0, r7, r6		//  (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000)
+
+	LDR r8, =0xF0000000
+	ADD r4, r0, r8		// (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000) + 0xF0000000)
+
+	LDR r0, =gpio_addr
+	STR r4, [r0]
+
+POP		{r4, r5, r6, r7, r8, pc}
+
+setOutputAndInput:
+PUSH	{r4, r5, r6, lr}
 	// Load gpio address
 	LDR r5, =gpio_addr
 	LDR r5, [r5]
@@ -90,10 +104,10 @@ PUSH	{r4, r5, r6, lr}
 	// Load list of gpio nr
 	LDR r4, =gpio_list
 
-loop:
+setOutput:
 	LDR r0, [r4] // Load value from list
 	CMP r0, #9
-	BEQ next
+	BEQ setInput
 
 	MOV r1, #10 // Divide by 10
 	BL idiv // r0 = kvoten, r1 = resten
@@ -107,11 +121,10 @@ loop:
 	// (1<<(((GPIO_NR)%10)*3)
 	MOV r3, #3
 	MUL r1, r3
-	LSR r1, #1
+	LSL r1, #1
 
 	LDR r3, [r2]
 	ORR r3, r3, r1
-
 	STR r3, [r2]		//Tvärtom, från VL till HL
 
 
@@ -120,10 +133,31 @@ loop:
 	LDR	r0, =format
 	BL printk
 
+
 	ADD r4, #4
-	BL loop
-next:
+	BL setOutput
+setInput:
+	// Set input
+
+POP	{r4, r5, r6, pc}
+
+setHigh:
+PUSH	{r4, r5, r6, lr}
 	
+	
+
+POP		{r4, r5, r6, pc}
+
+/*
+ * Sätt upp åtkomst till GPIO-pinnarnas minne
+ */
+.GLOBAL setup
+setup:
+PUSH	{lr}
+	BL setGPIO_addr
+	BL setOutputAndInput
+	BL setHigh
+POP		{pc}
 
 //Ej testad
 /*
@@ -262,29 +296,6 @@ awzomeName:
 	BL printk
 */
 
-POP	{r4, r5, r6, pc}
-
-setGPIO_addr:
-PUSH {r4, r5, r6, r7, r8, lr}
-
-	LDR r4, =0x3F200000
-	LDR r5, =0x00FFFFFF
-	AND r6, r4, r5			// (((addr) & 0x00FFFFFF)
-
-	LDR r5, =0x0F000000
-	LSR r4, #4			// (((addr) >> 4)
-	AND r7, r4, r5		// ((addr) & 0x00FFFFFF) + (((addr) >> 4)
-
-	ADD r0, r7, r6		//  (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000)
-
-	LDR r8, =0xF0000000
-	ADD r4, r0, r8		// (((addr) & 0x00FFFFFF) + (((addr) >> 4) &0x0F000000) + 0xF0000000)
-
-	LDR r0, =gpio_addr
-	STR r4, [r0]
-
-
-POP {r4, r5, r6, r7, r8, pc}
 /*
 ** Ta bort åtkomst till GPIO
 */
