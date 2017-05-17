@@ -1,1 +1,1 @@
-echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" ; clear ; ssh raspberrypi 'sudo rm "/var/log/kern.log"; sudo touch /var/log/kern.log; sudo shutdown -r now' ; sleep 5 ; make all ; make LINES=2000 grablogs
+echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" ; clear ; ssh raspberrypi 'sudo rm "/var/log/kern.log"; sudo touch /var/log/kern.log; sudo shutdown -r now' ; sleep 5 ; make all ; echo "Done!" ; sleep 2 ; make LINES=2000 grablogs ; echo "\nmake LINES=2000 grablogs | grep Value: " ; make LINES=2000 grablogs | grep "Value"
