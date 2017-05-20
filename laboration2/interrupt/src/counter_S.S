@@ -6,24 +6,22 @@ format: .asciz	"Value: 0x%x\n"	// Formatsträng som i printf()
 formatDown: .asciz	"ValueDown: %d\n"	// Formatsträng som i printf()
 formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
 tmp:   .word	0		// Variabeln tmp initierad till 0
-gpio_list:	.word	17, 18, 21, 22, 9, 10 // Array of variables.
+gpio_list:	.word	17, 18, 27, 22, 9, 10 // Array of variables.
 gpio_curr_nr:	.word	0
 gpio_addr:	.word	0
 
 .text
 
-//Ej testad
-/*
 short_wait:
-	MOV r0, #150
+PUSH	{lr}
+	MOV r0, #150 // :)
 	whileWait:
-		ADD r0, r0, #2
-		SUB r0, r0, #3
+		SUB r0, r0, #1
+		ADD r0, r0, #1
+		SUB r0, r0, #1
+		CMP r0, #0
 		BNE whileWait
-bx lr
-	
-*/
-
+POP		{pc}
 
 /*
 ** Division
@@ -120,8 +118,9 @@ setOutput:
 
 	// (1<<(((GPIO_NR)%10)*3)
 	MOV r3, #3
-	MUL r1, r3
-	LSL r1, #1
+	MUL r1, r1, r3
+	MOV r0, #1
+	LSL r1, r0, r1
 
 	LDR r3, [r2]
 	ORR r3, r3, r1
