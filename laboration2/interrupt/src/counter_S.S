@@ -7,8 +7,8 @@ formatDown: .asciz	"ValueDown: %d\n"	// Formatsträng som i printf()
 formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
 tmp:   .word	0		// Variabeln tmp initierad till 0
 gpio_list:	.word	17, 18, 27, 22, 9, 10, 0 // Array of variables.
-gpio_curr_nr:	.word	0
 gpio_addr:	.word	0
+curr_nr:	.word	1
 
 .text
 
@@ -52,37 +52,67 @@ BX lr
 .GLOBAL counter_isr_up
 counter_isr_up:
 PUSH	{lr}
+	LDR r0, =curr_nr
+	LDR r1, [r0]
+	ADD r1, #1
 
-	//LDR r0, =gpio_curr_nr
-	//CMP r0, #16
-	//MOVEQ
+	CMP r1, #16
+	MOVEQ r1, #1
+	STR r1, [r0]
 
-
-	LDR r0,=formatUp	// Laddar adressen till format
-	LDR r1,=tmp			// Laddar adressen till tmp
-	LDR r1,[r1]			// Laddar värdet av tmp
-	BL printk			// Kallar på printk()
-
-	BL setLow
-
+	BL showNr
 
 POP		{pc}
+
+showNr:
+PUSH	{r4, lr}
+
+LDR r4, =gpio_list
+setAllDark:
+LDR r0, [r4]
+CMP r0, #9
+BEQ exitSetAllDark
+
+BL setDark
+
+ADD r4, #4
+BL setAllDark
+exitSetAllDark:
+
+
+LDR r0, =curr_nr
+LDR r0, [r0]
+
+//idiv om r1 = 1 vid div med 2
+MOV r1, #2
+BL idiv
+
+MOV r0, #17
+CMP r1, #1
+BEQ setLight
+
+
+
+POP		{r4, pc}
 
 /*
 ** Avbrottsrutin som kallas när ett avbrott sker. Ska räkna neråt
 */
 .GLOBAL counter_isr_down
 counter_isr_down:
-PUSH    {lr}
+PUSH	{lr}
 
-	LDR r0,=formatUp	// Laddar adressen till format
-	LDR r1,=tmp			// Laddar adressen till tmp
-	LDR r1,[r1]			// Laddar värdet av tmp
-	BL printk			// Kallar på printk()
+	LDR r0, =curr_nr
+	LDR r1, [r0]
+	SUB r1, #1
 
-	BL setHigh
+	CMP r1, #1
+	MOVEQ r1, #15
+	STR r1, [r0]
 
-POP     {pc}
+	BL showNr
+
+POP		{pc}
 
 setGPIO_addr:
 PUSH	{r4, r5, r6, r7, r8, lr}
@@ -257,6 +287,48 @@ POP		{r0, r1}
 endLowLoop:
 
 POP		{r4, r5, pc}
+
+setLight:
+PUSH {r4, r5, r6, r8, lr}
+	LDR r5, =gpio_addr
+	LDR r5, [r5]
+	MOV r4, r0
+
+	MOV r1, #32
+	BL idiv
+	ADD r0, r0, #7
+	MOV r1, #4
+	MUL r0, r1
+	ADD r8, r5, r0
+
+	MOV r0, r4
+	MOV r1, #32
+	BL idiv
+	MOV r0, #1
+	LSL r6, r0, r1
+	STR r6, [r8]
+POP {r4, r5, r6, r8, pc}
+
+setDark:
+PUSH {r4, r5, r6, r8, lr}
+	LDR r5, =gpio_addr
+	LDR r5, [r5]
+	MOV r4, r0
+
+	MOV r1, #32
+	BL idiv
+	ADD r0, r0, #10
+	MOV r1, #4
+	MUL r0, r1
+	ADD r8, r5, r0
+
+	MOV r0, r4
+	MOV r1, #32
+	BL idiv
+	MOV r0, #1
+	LSL r6, r0, r1
+	STR r6, [r8]
+POP {r4, r5, r6, r8, pc}
 
 /*
  * Sätt upp åtkomst till GPIO-pinnarnas minne
