@@ -94,7 +94,7 @@ PUSH	{r4, r5, r6, r7, r8, lr}
 POP		{r4, r5, r6, r7, r8, pc}
 
 setOutputAndInput:
-PUSH	{r4, r5, r6, lr}
+PUSH	{r4, r5, lr}
 	// Load gpio address
 	LDR r5, =gpio_addr
 	LDR r5, [r5]
@@ -107,11 +107,10 @@ setOutput:
 	CMP r0, #9
 	BEQ setInput
 
+	// (gpio_addr + (4*(GPIO_NR/10)))
 	MOV r1, #10 // Divide by 10
 	BL idiv // r0 = kvoten, r1 = resten
 
-
-	// (gpio_addr + (4*(GPIO_NR/10)))
 	MOV r3, #4
 	MUL r0, r3
 	ADD r2, r0, r5
@@ -165,10 +164,10 @@ setPullUp:
 	BL setPullUp
 awzomeName:
 
-POP	{r4, r5, r6, pc}
+POP	{r4, r5, pc}
 
 setHigh:
-PUSH	{r4, r5, r6, lr}
+PUSH	{r4, r5, lr}
 
 	LDR r5, =gpio_addr
 	LDR r5, [r5]
@@ -202,20 +201,12 @@ POP		{r0, r1}
 	ADD r4, #4
 	BL setHighLoop
 
-
-/*
-	ADD r6, r5, #0x1c
-	LDR r0, [r6]
-	ADD r0, #20000
-	STR r0, [r6]
-*/
-
 endHighLoop:
 
-POP		{r4, r5, r6, pc}
+POP		{r4, r5, pc}
 
 setLow:
-PUSH	{r4, r5, r6, lr}
+PUSH	{r4, r5, lr}
 
 	LDR r5, =gpio_addr
 	LDR r5, [r5]
@@ -249,17 +240,9 @@ POP		{r0, r1}
 	ADD r4, #4
 	BL setLowLoop
 
-
-/*
-	ADD r6, r5, #0x1c
-	LDR r0, [r6]
-	ADD r0, #20000
-	STR r0, [r6]
-*/
-
 endLowLoop:
 
-POP		{r4, r5, r6, pc}
+POP		{r4, r5, pc}
 
 /*
  * Sätt upp åtkomst till GPIO-pinnarnas minne
@@ -271,121 +254,6 @@ PUSH	{lr}
 	BL setOutputAndInput
 	BL setHigh
 POP		{pc}
-
-
-
-
-
-
-//GPIO_NR till output
-/*
-	MOV r0, #0			//Reset r0
-	LDR r0, =#0xf3200000
-	ADD r6, #4
-	LDR r0, [r6]
-	ORR r0, #8
-	STR r0, [r6]		//Tvärtom, alltså r4 till addressen i r8.
-*/
-
-
-// Sätta en GPIO pin till input
-/*
-	MOV r0, #0
-	LDR r0, =#0xf3200000
-	ADD r7, #4
-	LDR r0, [r7]
-	AND r0, #8
-	STR r0, [r7]
-*/
-
-
-// Sätta en output till högt läge, 1.
-/*
-	MOV r0, #0
-	LDR r0, =#0xf3200000
-	ADD r7, #0x1c
-	LDR r0, [r7]
-	ADD r0, #400
-	STR r0, [r7]
-*/
-
-
-// För att sätta en output-pin till lågt läge används följande:
-/*
-	MOV r0, #0
-	LDR r0, =#0xf3200000
-	ADD r6, #28
-	LDR r0, [r6]
-	ADD r0, #0x1c
-	STR r0, [r6]
-*/
-
-
-
-
-//	STR r2, [r4]
-//	MOV r2, #0x1c
-//	AND r2, #0x190
-
-	// LDR r2, [r4]
-	// LSR r2, #0x1c
-	// MOV r2, #0x190
-	// STR r1, [r2]
-
-
-
-
-
-	// ADD r5, r4, #1
-	// LSR r5, r5, #4
-
-	// MOV r6, #0x1c
-
-	// LDR r7, [r6]
-	// MOV r6, #0x1c
-	// LDR r2, [r6], r7
-
-
-
-	// LSR r1, #4
-	//LDR r1, [r4]
-
-
-//	ORR r2, r1, #8
-
-
-	// ORR r1, r7, #190
-//	STR r0, r2
-
-
-
-// 2^3
-
-
-
-/*
-	LDR r4, =0x3F200000
-	LDR r5, =0x00FFFFFF
-	LDR r6, =0x0F000000
-	LDR r7, =0xF0000000
-
-
-	AND r4, r4, r5
-
-	MOV r5, #66
-	MOV r4, r5
-*/
-
-	//MOV r1, r0
-/*
-	LDR r1, =gpio_addr
-	LDR r1, [r1]
-
-	LDR	r0, =format	// Laddar adressen till format
-	//LDR	r1, =tmp		// Laddar adressen till tmp
-	//LDR	r1, [r1]		// Laddar värdet av tmp
-	BL printk
-*/
 
 /*
 ** Ta bort åtkomst till GPIO
