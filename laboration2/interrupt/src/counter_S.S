@@ -12,17 +12,6 @@ gpio_addr:	.word	0
 
 .text
 
-short_wait:
-PUSH	{lr}
-	MOV r0, #150 // :)
-	whileWait:
-		SUB r0, r0, #1
-		ADD r0, r0, #1
-		SUB r0, r0, #1
-		CMP r0, #0
-		BNE whileWait
-POP		{pc}
-
 /*
 ** Division
 */
@@ -45,18 +34,39 @@ idiv:
 	BX lr
 
 /*
+** Short wait
+*/
+short_wait:
+	MOV r0, #150 // :)
+whileWait:
+	SUB r0, r0, #1
+	ADD r0, r0, #1
+	SUB r0, r0, #1
+	CMP r0, #0
+	BNE whileWait
+BX lr
+
+/*
 ** Avbrottsrutin som kallas när ett interrupt sker. Ska räkna uppåt
 */
 .GLOBAL counter_isr_up
 counter_isr_up:
 PUSH	{lr}
 
-	LDR	r0,=formatUp	// Laddar adressen till format
-	LDR	r1,=tmp		// Laddar adressen till tmp
-	LDR	r1,[r1]		// Laddar värdet av tmp
-	BL printk		// Kallar på printk()
+	//LDR r0, =gpio_curr_nr
+	//CMP r0, #16
+	//MOVEQ
 
-POP	{pc}
+
+	LDR r0,=formatUp	// Laddar adressen till format
+	LDR r1,=tmp			// Laddar adressen till tmp
+	LDR r1,[r1]			// Laddar värdet av tmp
+	BL printk			// Kallar på printk()
+
+	BL setLow
+
+
+POP		{pc}
 
 /*
 ** Avbrottsrutin som kallas när ett avbrott sker. Ska räkna neråt
@@ -65,10 +75,12 @@ POP	{pc}
 counter_isr_down:
 PUSH    {lr}
 
-        LDR     r0,=formatDown      // Laddar adressen till format
-        LDR     r1,=tmp         // Laddar adressen till tmp
-        LDR     r1,[r1]         // Laddar värdet av tmp
-        BL printk               // Kallar på printk()
+	LDR r0,=formatUp	// Laddar adressen till format
+	LDR r1,=tmp			// Laddar adressen till tmp
+	LDR r1,[r1]			// Laddar värdet av tmp
+	BL printk			// Kallar på printk()
+
+	BL setHigh
 
 POP     {pc}
 
@@ -136,6 +148,7 @@ setOutput:
 	BL setOutput
 
 setInput:
+
 	//(gpio_addr + 148) = 2
 	ADD r2, r5, #148
 	MOV r3, #2
@@ -143,14 +156,15 @@ setInput:
 	BL short_wait
 
 setPullUp:
+
 	//(gpio_addr + 152) = (1<<(GPIO_NR%32))
 	
 	CMP r0, #0
 	BEQ awzomeName
 
 	ADD r2, r5, #152
-	MOV r3, #1
 
+	MOV r3, #1
 	MOV r1, #32
 	BL idiv
 	LSL r1, r1, r3
@@ -163,8 +177,8 @@ setPullUp:
 	LDR r0, [r4]
 	BL setPullUp
 awzomeName:
-
 POP	{r4, r5, pc}
+
 
 setHigh:
 PUSH	{r4, r5, lr}
