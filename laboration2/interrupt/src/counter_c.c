@@ -47,11 +47,12 @@ static int __init btnrpi_init(void)
 static void __exit btnrpi_exit(void)
 {
 	printk(KERN_INFO "COUNTER - Unloading driver\n");
-	setdown();
+	
 	// free irqs
 	free_irq(IRQ1, NULL);
 	free_irq(IRQ2, NULL);
-
+	
+	setdown();
 }
 
 MODULE_LICENSE("GPLv3");
