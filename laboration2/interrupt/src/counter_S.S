@@ -6,7 +6,7 @@ format: .asciz	"Value: 0x%x\n"	// Formatsträng som i printf()
 formatDown: .asciz	"ValueDown: %d\n"	// Formatsträng som i printf()
 formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
 tmp:   .word	0		// Variabeln tmp initierad till 0
-gpio_list:	.word	17, 18, 27, 22, 9, 10 // Array of variables.
+gpio_list:	.word	17, 18, 27, 22, 9, 10, 0 // Array of variables.
 gpio_curr_nr:	.word	0
 gpio_addr:	.word	0
 
@@ -135,8 +135,31 @@ setOutput:
 
 	ADD r4, #4
 	BL setOutput
+
 setInput:
-	// Set input
+	//(gpio_addr + 148) = 2
+	ADD r2, r5, #148
+	MOV r3, #2
+	STR r3, [r2]
+	BL short_wait
+
+setPullUp:
+	//(gpio_addr + 152) = (1<<(GPIO_NR%32))
+	LDR r0, [r4]
+	CMP r0, #0
+	BEQ awzomeName
+
+	ADD r2, r5, #152
+	MOV r3, #1
+	LSL r1, r3, r0
+	//Dividera innan LSL
+	STR r1, [r2]
+
+	BL short_wait
+
+	ADD r4, #4
+	BL setPullUp
+awzomeName:
 
 POP	{r4, r5, r6, pc}
 
@@ -161,7 +184,7 @@ setHighLoop:
 	ADD r0, r5	// Add gpio address
 
 	MOV r3, #1
-	LSL r3, r1
+	LSL r3, r3, r1
 
 	STR r3, [r0]
 
@@ -187,6 +210,53 @@ endHighLoop:
 
 POP		{r4, r5, r6, pc}
 
+setLow:
+PUSH	{r4, r5, r6, lr}
+
+	LDR r5, =gpio_addr
+	LDR r5, [r5]
+	LDR r4, =gpio_list
+
+setLowLoop:
+	LDR r0, [r4]
+	CMP r0, #9
+	BEQ endLowLoop
+
+	MOV r1, #32
+	BL idiv
+
+	ADD r0, #10
+	MOV r2, #4
+	MUL r0, r2
+	ADD r0, r5	// Add gpio address
+
+	MOV r3, #1
+	LSL r3, r3, r1
+
+	STR r3, [r0]
+
+PUSH	{r0, r1}
+	// Print info
+	MOV r1, r3
+	LDR	r0, =format
+	BL printk
+POP		{r0, r1}
+
+	ADD r4, #4
+	BL setLowLoop
+
+
+/*
+	ADD r6, r5, #0x1c
+	LDR r0, [r6]
+	ADD r0, #20000
+	STR r0, [r6]
+*/
+
+endLowLoop:
+
+POP		{r4, r5, r6, pc}
+
 /*
  * Sätt upp åtkomst till GPIO-pinnarnas minne
  */
@@ -197,28 +267,6 @@ PUSH	{lr}
 	BL setOutputAndInput
 	BL setHigh
 POP		{pc}
-
-//Ej testad
-/*
-LDR r5, =gpio_addr
-LDR r5, [r5]
-pullUp:
-LDR r0, [r4]
-LDR r0, r0	
-CMP r0, #0
-BEQ awzomeName
-	
-	ADD r2, r5, #152
-	LSL r1, r0, #1
-	//Dividera innan LSL
-	LDR r1, [r2]  //?
-	
-	
-ADD r4, #4
-//wait?
-BL pullUp
-awzomeName:
-*/
 
 
 
@@ -340,17 +388,17 @@ awzomeName:
 */
 .GLOBAL setdown
 setdown:
+PUSH	{lr}
+	LDR r0, =gpio_addr
+	LDR r0, [r0]
 
-//Ej testad
-//återställer pull up läget
-/*
-LDR r0, =gpio_addr
-LDR r0, [r0]
-ADD  r0, #148
-MOV r1, #0
-LDR  r1, [r0]
-SUB r0, #4
-LDR r1, [r0]
-*/
+	ADD r0, #148
+	MOV r1, #0
+	STR r1, [r0]
+	ADD r0, #4
+	STR r1, [r0]
 
+	BL short_wait
 
+	BL setLow
+POP		{pc}
