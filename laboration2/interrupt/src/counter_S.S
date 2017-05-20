@@ -145,19 +145,23 @@ setInput:
 
 setPullUp:
 	//(gpio_addr + 152) = (1<<(GPIO_NR%32))
-	LDR r0, [r4]
+	
 	CMP r0, #0
 	BEQ awzomeName
 
 	ADD r2, r5, #152
 	MOV r3, #1
-	LSL r1, r3, r0
-	//Dividera innan LSL
+
+	MOV r1, #32
+	BL idiv
+	LSL r1, r1, r3
+
 	STR r1, [r2]
 
 	BL short_wait
 
 	ADD r4, #4
+	LDR r0, [r4]
 	BL setPullUp
 awzomeName:
 
