@@ -3,8 +3,9 @@
 ** Variabler här
 */
 format: .asciz	"Value: 0x%x\n"	// Formatsträng som i printf()
-formatDown: .asciz	"ValueDown: %d\n"	// Formatsträng som i printf()
-formatUp: .asciz	"ValueUp: %d\n"	// Formatsträng som i printf()
+formatDown: .asciz	"LightOff: %d\n"	// Formatsträng som i printf()
+formatUp: .asciz	"LightOn: %d\n"	// Formatsträng som i printf()
+light: .asciz	"Light: %d\n"
 tmp:   .word	0		// Variabeln tmp initierad till 0
 gpio_list:	.word	17, 18, 27, 22, 9, 10, 0 // Array of variables.
 gpio_addr:	.word	0
@@ -62,38 +63,92 @@ PUSH	{lr}
 
 	BL showNr
 
+
 POP		{pc}
 
 showNr:
-PUSH	{r4, lr}
+PUSH	{r4, r5, lr}
 
-LDR r4, =gpio_list
+	LDR r4, =gpio_list
 setAllDark:
-LDR r0, [r4]
-CMP r0, #9
-BEQ exitSetAllDark
+	LDR r0, [r4]
+	CMP r0, #9
+	BEQ exitSetAllDark
 
-BL setDark
+	BL setDark
 
-ADD r4, #4
-BL setAllDark
+	ADD r4, #4
+	BL setAllDark
 exitSetAllDark:
 
-
-LDR r0, =curr_nr
-LDR r0, [r0]
-
-//idiv om r1 = 1 vid div med 2
-MOV r1, #2
-BL idiv
-
-MOV r0, #17
-CMP r1, #1
-BEQ setLight
+	LDR r3, =curr_nr
+	LDR r3, [r3]
 
 
+PUSH {r0, r1, r2, r3}
+	MOV r1, r3
+	LDR	r0, =format
+	BL printk
+POP {r0, r1, r2, r3}
 
-POP		{r4, pc}
+
+	MOV r5, #0x01
+	AND r5, r3, r5
+	CMP r5, #1
+	MOV r0, #17
+	BLEQ setLight
+
+
+PUSH {r0, r1, r2, r3}
+	MOV r1, r5
+	LDR	r0, =light
+	BL printk
+POP {r0, r1, r2, r3}
+
+
+	MOV r5, #0x02
+	AND r5, r3, r5
+	CMP r5, #2
+	MOV r0, #18
+	BLEQ setLight
+
+
+PUSH {r0, r1, r2, r3}
+	MOV r1, r5
+	LDR	r0, =light
+	BL printk
+POP {r0, r1, r2, r3}
+
+
+	MOV r5, #0x04
+	AND r5, r3, r5
+	CMP r5, #4
+	MOV r0, #27
+	BLEQ setLight
+
+
+PUSH {r0, r1, r2, r3}
+	MOV r1, r5
+	LDR	r0, =light
+	BL printk
+POP {r0, r1, r2, r3}
+
+
+	MOV r5, #0x08
+	AND r5, r3, r5
+	CMP r5, #8
+	MOV r0, #22
+	BLEQ setLight
+
+
+PUSH {r0, r1, r2, r3}
+	MOV r1, r5
+	LDR	r0, =light
+	BL printk
+POP {r0, r1, r2, r3}
+
+
+POP		{r4, r5, pc}
 
 /*
 ** Avbrottsrutin som kallas när ett avbrott sker. Ska räkna neråt
@@ -106,7 +161,7 @@ PUSH	{lr}
 	LDR r1, [r0]
 	SUB r1, #1
 
-	CMP r1, #1
+	CMP r1, #0
 	MOVEQ r1, #15
 	STR r1, [r0]
 
@@ -235,12 +290,12 @@ setHighLoop:
 
 	STR r3, [r0]
 
-PUSH	{r0, r1}
+PUSH	{r0, r1, r2, r3}
 	// Print info
 	MOV r1, r3
 	LDR	r0, =format
 	BL printk
-POP		{r0, r1}
+POP		{r0, r1, r2, r3}
 
 	ADD r4, #4
 	BL setHighLoop
@@ -274,12 +329,12 @@ setLowLoop:
 
 	STR r3, [r0]
 
-PUSH	{r0, r1}
+PUSH	{r0, r1, r2, r3}
 	// Print info
 	MOV r1, r3
 	LDR	r0, =format
 	BL printk
-POP		{r0, r1}
+POP		{r0, r1, r2, r3}
 
 	ADD r4, #4
 	BL setLowLoop
@@ -290,6 +345,13 @@ POP		{r4, r5, pc}
 
 setLight:
 PUSH {r4, r5, r6, r8, lr}
+
+PUSH {r0, r1, r2, r3}
+	MOV r1, r0
+	LDR	r0, =formatUp
+	BL printk
+POP {r0, r1, r2, r3}
+
 	LDR r5, =gpio_addr
 	LDR r5, [r5]
 	MOV r4, r0
@@ -307,10 +369,18 @@ PUSH {r4, r5, r6, r8, lr}
 	MOV r0, #1
 	LSL r6, r0, r1
 	STR r6, [r8]
+
+	BL short_wait
 POP {r4, r5, r6, r8, pc}
 
 setDark:
 PUSH {r4, r5, r6, r8, lr}
+
+PUSH {r0, r1, r2, r3}
+	MOV r1, r0
+	LDR	r0, =formatDown
+	BL printk
+POP {r0, r1, r2, r3}
 	LDR r5, =gpio_addr
 	LDR r5, [r5]
 	MOV r4, r0
@@ -328,6 +398,8 @@ PUSH {r4, r5, r6, r8, lr}
 	MOV r0, #1
 	LSL r6, r0, r1
 	STR r6, [r8]
+
+	BL short_wait
 POP {r4, r5, r6, r8, pc}
 
 /*
@@ -339,6 +411,7 @@ PUSH	{lr}
 	BL setGPIO_addr
 	BL setOutputAndInput
 	BL setHigh
+	BL showNr
 POP		{pc}
 
 /*
