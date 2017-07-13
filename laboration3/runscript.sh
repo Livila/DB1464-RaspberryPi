@@ -7,9 +7,9 @@ if [ $? -eq 0 ]; then
     echo 'Result:';
     echo;
     ./main
-    echo;
 else
     # Some error occured...
     echo 'Some error occured, could not compile...';
-    echo;
 fi
+
+echo;

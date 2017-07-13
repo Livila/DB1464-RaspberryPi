@@ -1,67 +1,82 @@
 	.data
 
-debugString:
-	.asciz "eax=%d, ebx=%d\12\0" # \12 = line-feed character. \0 = null character
-buf: .space 64
+dbgStr:	.asciz	"Debug: %d\12\0" # \12 = line-feed character. \0 = null character
+buf:	.space	64
+bufPos:	.quad	0
 
 	.text
+	.global inImage
+	.global getInt
+	.global getText
+	.global getChar
+	.global getInPos
+	.global setInPos
+	.global outImage
+	.global putInt
+	.global putText
+	.global putChar
+	.global getOutPos
+	.global setOutPos
 
-.GLOBAL inImage
 inImage:
-	//movabsq = flytta imidiet värde
-	movabsq $0, %rdx
 	movq $buf, %rdi
-	movabsq $9223372036854775805, %rsi
+	movq $64, %rsi
 	movq stdin, %rdx
+	movq $0, bufPos
 	call fgets
 
-//	movl $10, %eax
-//	movl $12, %ebx
-	movq $debugString, %rdi
+	movq $0, %rax
+	movq $dbgStr, %rdi
+	movq $buf, %rdx
+
 	call printf
+
+#	//movabsq = flytta imidiet värde
+#	movabsq $0, %rdx
+#	movq $buf, %rdi
+#	movabsq $9223372036854775805, %rsi
+#	movq stdin, %rdx
+#	call fgets
+#
+#//	movl $10, %eax
+#//	movl $12, %ebx
+#	movq $dbgStr, %rdi
+#	call printf
+
+
+
 
 ret
 
 
-.GLOBAL getInt
 getInt:
 
 
-.GLOBAL getText
 getText:
 
 
-.GLOBAL getChar
 getChar:
 
 
-.GLOBAL getInPos
 getInPos:
 
 
-.GLOBAL setInPos
 setInPos:
 
 
-.GLOBAL outImage
 outImage:
 
 
-.GLOBAL putInt
 putInt:
 
 
-.GLOBAL putText
 putText:
 
 
-.GLOBAL putChar
 putChar:
 
 
-.GLOBAL getOutPos
 getOutPos:
 
 
-.GLOBAL setOutPos
 setOutPos:
