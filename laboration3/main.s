@@ -1,9 +1,10 @@
 	.data
 
-.text
-debugString: .asciz "eax=%d, ebx=%d\12\0" // \12 = line-feed character. \0 = null character
+debugString:
+	.asciz "eax=%d, ebx=%d\12\0" # \12 = line-feed character. \0 = null character
 buf: .space 64
 
+	.text
 
 .GLOBAL inImage
 inImage:
