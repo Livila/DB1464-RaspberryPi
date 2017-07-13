@@ -2,3 +2,5 @@ as -o main.o main.s && gcc -g -o main main.o && gdb main
 Use: gcc -g -o main main.s && gdb main
 http://cessa.khu.ac.ir/wp-content/uploads/2015/12/Computer-Organization-and-Design-5th-Edition-Patterson-Hennessy.pdf
 note irq
+
+Book about assembly: https://en.wikibooks.org/wiki/X86_Assembly
