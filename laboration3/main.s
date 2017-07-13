@@ -1,24 +1,11 @@
 	.data
 
-
-debugString: .string "eax=%d, ebx=%d"
+.text
+debugString: .asciz "eax=%d, ebx=%d\12\0" // \12 = line-feed character. \0 = null character
 buf: .space 64
 
-	.text
 
-	.GLOBAL inImage
-	.GLOBAL getInt
-	.GLOBAL getText
-	.GLOBAL getChar
-	.GLOBAL getInPos
-	.GLOBAL setInPos
-	.GLOBAL outImage
-	.GLOBAL putInt
-	.GLOBAL putText
-	.GLOBAL putChar
-	.GLOBAL getOutPos
-	.GLOBAL setOutPos
-
+.GLOBAL inImage
 inImage:
 	//movabsq = flytta imidiet värde
 	movabsq $0, %rdx
@@ -35,34 +22,45 @@ inImage:
 ret
 
 
+.GLOBAL getInt
 getInt:
 
 
+.GLOBAL getText
 getText:
 
 
+.GLOBAL getChar
 getChar:
 
 
+.GLOBAL getInPos
 getInPos:
 
 
+.GLOBAL setInPos
 setInPos:
 
 
+.GLOBAL outImage
 outImage:
 
 
+.GLOBAL putInt
 putInt:
 
 
+.GLOBAL putText
 putText:
 
 
+.GLOBAL putChar
 putChar:
 
 
+.GLOBAL getOutPos
 getOutPos:
 
 
+.GLOBAL setOutPos
 setOutPos:
