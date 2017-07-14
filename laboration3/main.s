@@ -25,11 +25,13 @@ inImage:
 	movq $0, bufPos
 	call fgets
 
-	movq $0, %rax
-	movq $dbgStr, %rdi
-	movq $buf, %rdx
+push %rbx
+	lea dbgStr(%rip), %rdi
+	mov bufPos, %esi
+	xor %eax, %eax
 
 	call printf
+pop %rbx
 
 #	//movabsq = flytta imidiet värde
 #	movabsq $0, %rdx
@@ -37,14 +39,6 @@ inImage:
 #	movabsq $9223372036854775805, %rsi
 #	movq stdin, %rdx
 #	call fgets
-#
-#//	movl $10, %eax
-#//	movl $12, %ebx
-#	movq $dbgStr, %rdi
-#	call printf
-
-
-
 
 ret
 
