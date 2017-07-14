@@ -18,6 +18,26 @@ bufPos:	.quad	0
 	.global getOutPos
 	.global setOutPos
 
+# Usage:
+#  movq [value], %rdi
+#  call print
+print:
+push %rbx
+
+#x64
+	lea (%rdi), %esi			# Move parameter value to %esi (output).
+	lea dbgStr(%rip), %rdi		# Basically mov $dbgStr, %rbx ... mov (%rbx), %rdi
+	xor %eax, %eax				# Writing to EAX zero extends to RAX.
+
+#x32
+#	mov %rdi, %rsi				# Value to be printed. %rdi contains the value.
+#	mov $dbgStr, %rdi			# The text formatting.
+#	mov $0, %eax				# Writing to EAX zero extends to RAX.
+
+	call printf
+pop %rbx
+ret
+
 inImage:
 	movq $buf, %rdi
 	movq $64, %rsi
@@ -25,13 +45,8 @@ inImage:
 	movq $0, bufPos
 	call fgets
 
-push %rbx
-	lea dbgStr(%rip), %rdi
-	mov bufPos, %esi
-	xor %eax, %eax
-
-	call printf
-pop %rbx
+	movq buf, %rdi
+	call print
 
 #	//movabsq = flytta imidiet värde
 #	movabsq $0, %rdx
