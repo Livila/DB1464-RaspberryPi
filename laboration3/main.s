@@ -80,7 +80,25 @@ putInt:
 
 
 putText:
+	movq bufPos, %rbx
 
+.loop:
+	cmpb $0, (%rdi) # Check if there is anything left in the buffer.
+	je .end_loop
+
+	movb (%rdi), %al
+	movb %al, buf(, %rbx, 1)
+
+	# Check for overflow.
+	incq %rdi
+	incq %rbx
+
+	jmp .loop
+
+.end_loop:
+	movq %rbx, bufPos
+
+ret
 
 putChar:
 
