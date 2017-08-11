@@ -1,8 +1,10 @@
 	.data
 
-dbgStr:	.asciz	"Debug: %d\12\0" # \12 = line-feed character. \0 = null character
-buf:	.space	64
-bufPos:	.quad	0
+dbgStr:		.asciz	"Debug: %d\12\0" # \12 = line-feed character. \0 = null character
+bufIn:		.space	64
+bufInPos:	.quad	0
+bufOut:		.space	64
+bufOutPos:	.quad	0
 
 	.text
 	.global inImage
@@ -39,14 +41,15 @@ pop %rbx
 ret
 
 inImage:
-	pushq $0
-	movq $buf, %rdi				# Add buf to arg1.
+	pushq $0					# The stack is set to 16 bytes aligned.
+	movq $bufOut, %rdi			# Add buf to arg1.
 	movq $5, %rsi				# Read 64-1 symbols, arg2.
 	movq stdin, %rdx			# Read from console, arg3.
-	movq $0, bufPos
+	movq $0, bufOutPos
 	call fgets
 
-	movq $buf, %rdi
+	# Print buffer for testing.
+	movq $bufOut, %rdi
 	call printf
 
 #	//movabsq = flytta imidiet värde
@@ -81,14 +84,14 @@ putInt:
 
 
 putText:
-	movq bufPos, %rbx
+	movq bufOutPos, %rbx
 
 .loop:
 	cmpb $0, (%rdi) # Check if there is anything left in the buffer.
 	je .end_loop
 
 	movb (%rdi), %al
-	movb %al, buf(, %rbx, 1)
+	movb %al, bufOut(, %rbx, 1)
 
 	# Check for overflow.
 	incq %rdi
@@ -97,7 +100,7 @@ putText:
 	jmp .loop
 
 .end_loop:
-	movq %rbx, bufPos
+	movq %rbx, bufOutPos
 
 ret
 
