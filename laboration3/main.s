@@ -39,14 +39,15 @@ pop %rbx
 ret
 
 inImage:
-	movq $buf, %rdi
-	movq $64, %rsi
-	movq stdin, %rdx
+	pushq $0
+	movq $buf, %rdi				# Add buf to arg1.
+	movq $5, %rsi				# Read 64-1 symbols, arg2.
+	movq stdin, %rdx			# Read from console, arg3.
 	movq $0, bufPos
 	call fgets
 
-	movq buf, %rdi
-	call print
+	movq $buf, %rdi
+	call printf
 
 #	//movabsq = flytta imidiet värde
 #	movabsq $0, %rdx
