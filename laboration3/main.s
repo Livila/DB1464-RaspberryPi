@@ -20,26 +20,6 @@ bufOutPos:	.quad	0
 	.global getOutPos
 	.global setOutPos
 
-# Usage:
-#  movq [value], %rdi
-#  call print
-print:
-push %rbx
-
-#x64
-	lea (%rdi), %esi			# Move parameter value to %esi (output).
-	lea dbgStr(%rip), %rdi		# Basically mov $dbgStr, %rbx ... mov (%rbx), %rdi
-	xor %eax, %eax				# Writing to EAX zero extends to RAX.
-
-#x32
-#	mov %rdi, %rsi				# Value to be printed. %rdi contains the value.
-#	mov $dbgStr, %rdi			# The text formatting.
-#	mov $0, %eax				# Writing to EAX zero extends to RAX.
-
-	call printf
-pop %rbx
-ret
-
 inImage:
 	pushq $0					# The stack is set to 16 bytes aligned.
 	movq $bufOut, %rdi			# Add buf to arg1.
@@ -111,3 +91,26 @@ getOutPos:
 
 
 setOutPos:
+ret
+
+
+
+# Usage:
+#  movq [value], %rdi
+#  call print
+print:
+push %rbx
+
+#x64
+	lea (%rdi), %esi			# Move parameter value to %esi (output).
+	lea dbgStr(%rip), %rdi		# Basically mov $dbgStr, %rbx ... mov (%rbx), %rdi
+	xor %eax, %eax				# Writing to EAX zero extends to RAX.
+
+#x32
+#	mov %rdi, %rsi				# Value to be printed. %rdi contains the value.
+#	mov $dbgStr, %rdi			# The text formatting.
+#	mov $0, %eax				# Writing to EAX zero extends to RAX.
+
+	call printf
+pop %rbx
+ret
