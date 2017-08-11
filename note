@@ -2,8 +2,12 @@ as -o main.o main.s && gcc -g -o main main.o && gdb main
 Use: gcc -g -o main main.s && gdb main
 http://cessa.khu.ac.ir/wp-content/uploads/2015/12/Computer-Organization-and-Design-5th-Edition-Patterson-Hennessy.pdf
 
-Machine instructions: http://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html
+Machine instructions
+   http://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html
 
-Book about assembly: https://en.wikibooks.org/wiki/X86_Assembly
-  https://en.wikibooks.org/wiki/X86_Assembly/GAS_Syntax
+Book about assembly
+   https://en.wikibooks.org/wiki/X86_Assembly
+   https://en.wikibooks.org/wiki/X86_Assembly/GAS_Syntax
 
+Introduction to x64 Assembly
+   https://software.intel.com/en-us/articles/introduction-to-x64-assembly
