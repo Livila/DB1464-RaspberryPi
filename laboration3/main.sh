@@ -13,7 +13,7 @@ if [ $? -eq 0 ]; then
     ./main
 
     # Remove the executable file.
-    rm main
+#    rm main
 else
     # Some error occured...
     echo 'Some error occured, could not compile...';

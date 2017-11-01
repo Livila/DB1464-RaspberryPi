@@ -22,15 +22,15 @@ bufOutPos:	.quad	0
 
 inImage:
 	pushq $0					# The stack is set to 16 bytes aligned.
-	movq $bufOut, %rdi			# Add buf to arg1.
-	movq $5, %rsi				# Read 64-1 symbols, arg2.
+	movq $bufIn, %rdi			# Add buf to arg1.
+	movq $64, %rsi				# Read 64-1 symbols, arg2.
 	movq stdin, %rdx			# Read from console, arg3.
-	movq $0, bufOutPos
+	movq $0, bufInPos
 	call fgets
 
 	# Print buffer for testing.
-	movq $bufOut, %rdi
-	call printf
+	# movq $bufIn, %rdi
+	# call printf
 
 #	//movabsq = flytta imidiet värde
 #	movabsq $0, %rdx
@@ -43,7 +43,7 @@ ret
 
 
 getInt:
-
+ret
 
 getText:
 
@@ -59,11 +59,20 @@ setInPos:
 
 outImage:
 
+cmpb $0, (%rdi)
+je .end
+
+movq $bufOut, %rdi
+call printf
+
+.end:
+ret
 
 putInt:
 
 
 putText:
+ret
 	movq bufOutPos, %rbx
 
 .loop:
@@ -74,13 +83,22 @@ putText:
 	movb %al, bufOut(, %rbx, 1)
 
 	# Check for overflow.
-	incq %rdi
+	add $4, %rdi
 	incq %rbx
 
 	jmp .loop
 
 .end_loop:
 	movq %rbx, bufOutPos
+
+#test
+	pushq $0					# The stack is set to 16 bytes aligned.
+	movq $64, %rsi				# Read 64-1 symbols, arg2.
+	movq stdin, %rdx			# Read from console, arg3.
+	call fgets
+	movq $bufOut, %rdi
+	call printf
+#test
 
 ret
 
