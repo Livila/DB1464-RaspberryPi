@@ -1,6 +1,7 @@
 	.data
 
 dbgStr:		.asciz	"Debug: %d\12\0" # \12 = line-feed character. \0 = null character
+printStr: .asciz "\0"
 bufIn:		.space	64
 bufInPos:	.quad	0
 bufOut:		.space	64
@@ -59,20 +60,67 @@ setInPos:
 
 outImage:
 
-cmpb $0, (%rdi)
-je .end
 
-movq $bufOut, %rdi
-call printf
+
+
+# <FELIXTESTAR>
+
+	movq bufOutPos, %rbx
+	mov $0, %r8
+	movq $bufOut, %rdi
+
+.loop2:
+	cmpb $0, (%rdi) # Check if there is anything left in the buffer.
+	je .end_loop2
+
+	movb (%rdi), %al
+	movb %al, printStr(, %r8, 1)
+
+	# Check for overflow.
+	add $4, %rdi
+	incq %r8
+
+	jmp .loop2
+
+.end_loop2:
+	movq printStr, %rdi
+	call printf
+
+# </FELIXTESTAR>
+
+	# cmpq $bufOutPos, %rdi
+	# je .end
+
+	# movq $0, bufOutPos
+
+	# movq $bufOut, %rsi
+	# mov $0, %eax
+
+
+	# mov $bufOut, %rbx
+	# mov (%rbx), %rdi
+
+	#movq $bufOut, (%rdi)
+	#mov $0, %eax
+
+	#call printf
+
+
+	# movq bufOut, %rdi
+	# call print
+
 
 .end:
-ret
+	ret
 
 putInt:
 
 
 putText:
-ret
+
+# call print
+# ret
+
 	movq bufOutPos, %rbx
 
 .loop:
@@ -92,13 +140,8 @@ ret
 	movq %rbx, bufOutPos
 
 #test
-	pushq $0					# The stack is set to 16 bytes aligned.
-	movq $64, %rsi				# Read 64-1 symbols, arg2.
-	movq stdin, %rdx			# Read from console, arg3.
-	call fgets
-	movq $bufOut, %rdi
-	call printf
-#test
+
+#end testvalue
 
 ret
 
