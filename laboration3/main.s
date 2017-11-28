@@ -1,6 +1,7 @@
 	.data
 
 dbgStr:		.asciz	"Debug: %d\12\0" # \12 = line-feed character. \0 = null character
+textFormat:	.asciz	"%d\n\0"
 printStr: .asciz "\0"
 bufIn:		.space	64
 bufInPos:	.quad	0
@@ -121,12 +122,34 @@ putText:
 # <testPrint>
 	push %rbx
 	#x64
-	lea (%rdi), %esi			# Move parameter value to %esi (output).
+	# lea (%rdi), %esi			# Move parameter value to %esi (output).
 	call printf
 	pop %rbx
 
 
 # </testPrint>
+# <TestPrintBuff>  
+	push %rbx
+	push %rdi
+	#push %esi
+	#push %eax
+
+	mov $bufOut, %rdi
+	lea textFormat(%rip), %rdi
+	mov (%rdi), %esi
+	xor %eax, %eax
+	call printf
+	
+	#pop %eax
+	#pop %esi
+	pop %rdi
+	pop %rbx
+
+
+
+	
+	
+# </TestPrintBuff>
 	
 
 
@@ -147,6 +170,17 @@ putText:
 
 .end_loop:
 	movq %rbx, bufOutPos
+
+# <TestPrintBuff>
+	#push %rbx
+	mov $bufOut, %rdi
+	lea textFormat(%rip), %rdi
+	mov (%rdi),  %esi
+	xor %eax, %eax
+	call printf
+	
+	
+# </TestPrintBuff>
 
 # print
 
