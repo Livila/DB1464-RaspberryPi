@@ -117,9 +117,18 @@ putInt:
 
 
 putText:
+	
+# <testPrint>
+	push %rbx
+	#x64
+	lea (%rdi), %esi			# Move parameter value to %esi (output).
+	call printf
+	pop %rbx
 
-# call print
-# ret
+
+# </testPrint>
+	
+
 
 	movq bufOutPos, %rbx
 
@@ -138,6 +147,9 @@ putText:
 
 .end_loop:
 	movq %rbx, bufOutPos
+
+# print
+
 
 #test
 
