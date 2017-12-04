@@ -28,4 +28,26 @@ Some info on how to use gdb.
 
 `continue` - (c) Continue running the program until the next breakpoint.
 
-Some link with more info: https://sourceware.org/gdb/onlinedocs/gdb/
+## Links with more info
+
+- https://sourceware.org/gdb/onlinedocs/gdb/
+
+- https://cs.brown.edu/courses/cs033/docs/guides/x64_cheatsheet.pdf
+
+## Older info
+
+as -o main.o main.s && gcc -g -o main main.o && gdb main
+
+Use: gcc -g -o main main.s && gdb main
+
+http://cessa.khu.ac.ir/wp-content/uploads/2015/12/Computer-Organization-and-Design-5th-Edition-Patterson-Hennessy.pdf
+
+Machine instructions
+   http://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html
+
+Book about assembly
+   https://en.wikibooks.org/wiki/X86_Assembly
+   https://en.wikibooks.org/wiki/X86_Assembly/GAS_Syntax
+
+Introduction to x64 Assembly
+   https://software.intel.com/en-us/articles/introduction-to-x64-assembly
