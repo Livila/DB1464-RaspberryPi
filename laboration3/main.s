@@ -2,11 +2,12 @@
 
 dbgStr:		.asciz	"Debug: %d\12\0" # \12 = line-feed character. \0 = null character
 textFormat:	.asciz	"%d\n\0"
-printStr: .asciz "\0"
+printStr:	.asciz "\0"
 bufIn:		.space	64
 bufInPos:	.quad	0
 bufOut:		.space	64
 bufOutPos:	.quad	0
+MAXPOS:		.quad 64
 
 	.text
 	.global inImage
@@ -23,12 +24,17 @@ bufOutPos:	.quad	0
 	.global setOutPos
 
 inImage:
-	pushq $0					# The stack is set to 16 bytes aligned.
-	movq $bufIn, %rdi			# Add buf to arg1.
-	movq $64, %rsi				# Read 64-1 symbols, arg2.
-	movq stdin, %rdx			# Read from console, arg3.
-	movq $0, bufInPos
-	call fgets
+#	pushq $0					# The stack is set to 16 bytes aligned.
+#	movq $bufIn, %rdi			# Add buf to arg1.
+#	movq $64, %rsi				# Read 64-1 symbols, arg2.
+#	movq stdin, %rdx			# Read from console, arg3.
+#	movq $0, bufInPos
+#	call fgets
+
+
+	#movq $'8', bufIn
+	#movq $0, bufInPos
+
 
 	# Print buffer for testing.
 	# movq $bufIn, %rdi
@@ -36,114 +42,140 @@ inImage:
 
 #	//movabsq = flytta imidiet värde
 #	movabsq $0, %rdx
-#	movq $buf, %rdi
-#	movabsq $9223372036854775805, %rsi
+#	movq $bufIn, %rdi
+#	movabsq $64, %rsi
+
 #	movq stdin, %rdx
+#	call fgets
+
+
+#	movq stdin(%rip), %rdx
+#	leaq -288(%rbp), %rax
+#	movl $64, %esi
+#	movq %rax, %rdi
 #	call fgets
 
 ret
 
 
 getInt:
+	#return val
+	mov $0, %rdi
+
+	leaq bufIn, %rcx # load buf
+	movq bufInPos, %r9 # get bufinPos
+	movq bufInPos, %rsi # get bufinPos
+	#imulq $4, %r9 # get first byte to read
+			
+	movq 0(%rcx), %r8 # get first character to look at
+
+	moveToBufPos:
+		movq 4(%rcx), %r8 # get first character to look at
+		decq %r9
+
+	
+
+	movq $1, %r10 # positive
+
+	cmpq $'-', (%r8) # check if char are -
+	jne cont
+	movq $-1, %r10 # negative
+
+cont:
+	cmpq $'+', (%r8) # check if char is positive
+	jne cont1
+	movq 4(%rcx), %r8 # skip the + sign
+
+
+cont1:
+	cmpq $-1, %r10
+	jne luup
+	movq 4(%rcx), %r8 # skip the - sign
+
+
+.luup:
+	# Check if it's a number.
+	# is the value between ascii 0 and 9
+	cmpq $'0', (%r8)
+	jl finluup
+	cmpq $'9', (%r8)
+	jg finluup
+
+	# save number
+	subq $'0', (%r8) # convert from ascii to int
+	imulq $10, %rdi # make space for new number in returnvalue
+	add %r8, %rdi # add to return value
+
+
+	movq 4(%rcx), %r8 # get next char
+	incq %rsi # increase bufInPos
+	jmp luup
+.finluup:
+
+imulq %r10, %rdi # make the value negative if specified
+
+# update bufInPos
+movq %rsi, bufInPos
+
 ret
 
 getText:
-
+ret
 
 getChar:
-
+ret
 
 getInPos:
-
+ret
 
 setInPos:
-
+ret
 
 outImage:
-
-
-
-
-# <FELIXTESTAR>
-
-	movq bufOutPos, %rbx
-	mov $0, %r8
 	movq $bufOut, %rdi
+	call puts
 
-.loop2:
-	cmpb $0, (%rdi) # Check if there is anything left in the buffer.
-	je .end_loop2
+	movq $0, bufOutPos
+	movq bufOutPos, %rbx
+	movq MAXPOS, %rax
+	incq %rax
+resetBufLoop:
+	cmpq %rax, %rbx
+	je end
 
-	movb (%rdi), %al
-	movb %al, printStr(, %r8, 1)
-
-	# Check for overflow.
-	add $4, %rdi
-	incq %r8
-
-	jmp .loop2
-
-.end_loop2:
-	movq printStr, %rdi
-	call printf
-
-# </FELIXTESTAR>
-
-	# cmpq $bufOutPos, %rdi
-	# je .end
-
-	# movq $0, bufOutPos
-
-	# movq $bufOut, %rsi
-	# mov $0, %eax
-
-
-	# mov $bufOut, %rbx
-	# mov (%rbx), %rdi
-
-	#movq $bufOut, (%rdi)
-	#mov $0, %eax
-
-	#call printf
-
-
-	# movq bufOut, %rdi
-	# call print
-
-
+	movb $0, bufOutPos(, %rbx, 1)
+	incq %rbx
+	jmp	resetBufLoop
 .end:
+	movq $0, bufOutPos
+
 	ret
 
 putInt:
-
+ret
 
 putText:
 	
-# <testPrint>
-	push %rbx
-	#x64
-	# lea (%rdi), %esi			# Move parameter value to %esi (output).
-	call printf
-	pop %rbx
+
 
 
 # </testPrint>
 # <TestPrintBuff>  
-	push %rbx
-	push %rdi
-	#push %esi
-	#push %eax
+	movq 	bufOutPos, %rbx
+putTLoop:
 
-	mov $bufOut, %rdi
-	lea textFormat(%rip), %rdi
-	mov (%rdi), %esi
-	xor %eax, %eax
-	call printf
-	
-	#pop %eax
-	#pop %esi
-	pop %rdi
-	pop %rbx
+	cmpb 	$0, (%rdi)
+	je 	finT
+	movb 	(%rdi), %al
+
+	movb 	%al, bufOut(, %rbx, 1)
+
+	incq 	%rdi
+	incq 	%rbx
+	jmp 	putTLoop
+
+finT:
+	movq 	%rbx, bufOutPos
 
 
 
@@ -153,32 +185,9 @@ putText:
 	
 
 
-	movq bufOutPos, %rbx
-
-.loop:
-	cmpb $0, (%rdi) # Check if there is anything left in the buffer.
-	je .end_loop
-
-	movb (%rdi), %al
-	movb %al, bufOut(, %rbx, 1)
-
-	# Check for overflow.
-	add $4, %rdi
-	incq %rbx
-
-	jmp .loop
-
-.end_loop:
-	movq %rbx, bufOutPos
-
 # <TestPrintBuff>
 	#push %rbx
-	mov $bufOut, %rdi
-	lea textFormat(%rip), %rdi
-	mov (%rdi),  %esi
-	xor %eax, %eax
-	call printf
-	
+
 	
 # </TestPrintBuff>
 
@@ -192,10 +201,10 @@ putText:
 ret
 
 putChar:
-
+ret
 
 getOutPos:
-
+ret
 
 setOutPos:
 ret
