@@ -24,36 +24,14 @@ MAXPOS:		.quad 64
 	.global setOutPos
 
 inImage:
-#	pushq $0					# The stack is set to 16 bytes aligned.
-#	movq $bufIn, %rdi			# Add buf to arg1.
-#	movq $64, %rsi				# Read 64-1 symbols, arg2.
-#	movq stdin, %rdx			# Read from console, arg3.
-#	movq $0, bufInPos
-#	call fgets
-
-
-	#movq $'8', bufIn
-	#movq $0, bufInPos
-
-
-	# Print buffer for testing.
-	# movq $bufIn, %rdi
-	# call printf
-
-#	//movabsq = flytta imidiet värde
-#	movabsq $0, %rdx
-#	movq $bufIn, %rdi
-#	movabsq $64, %rsi
-
-#	movq stdin, %rdx
-#	call fgets
-
-
-#	movq stdin(%rip), %rdx
-#	leaq -288(%rbp), %rax
-#	movl $64, %esi
-#	movq %rax, %rdi
-#	call fgets
+	#	//movabsq = flytta imidiet värde
+	movq $bufIn, %rdi			# The stack is set to 16 bytes aligned.
+	movabsq $65, %rsi			# Add buf to arg1.
+	movq stdin, %rdx			# Read 64-1 symbols, arg2.
+								# 	64 bytes chars.
+								# 	1 byte \0 to end the buff stream.
+	movq $0, bufInPos			# Read from console, arg3.
+	call fgets					# Read input from user.
 
 ret
 
