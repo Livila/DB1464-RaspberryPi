@@ -7,7 +7,7 @@ bufIn:		.space	64
 bufInPos:	.quad	0
 bufOut:		.space	64
 bufOutPos:	.quad	0
-MAXPOS:		.quad 64
+MAXPOS:		.quad	63
 
 	.text
 	.global inImage
@@ -40,55 +40,51 @@ getInt:
 	#return val
 	mov $0, %rdi
 
-	leaq bufIn, %rcx # load buf
+	leaq bufIn, %r8 # load buf
 	movq bufInPos, %r9 # get bufinPos
 	movq bufInPos, %rsi # get bufinPos
-	#imulq $4, %r9 # get first byte to read
-			
-	movq 0(%rcx), %r8 # get first character to look at
 
-	moveToBufPos:
-		movq 4(%rcx), %r8 # get first character to look at
-		decq %r9
-
-	
+	addq %r9, %r8
 
 	movq $1, %r10 # positive
 
-	cmpq $'-', (%r8) # check if char are -
+	cmpb $'-', (%r8) # check if char are -
 	jne cont
 	movq $-1, %r10 # negative
 
 cont:
-	cmpq $'+', (%r8) # check if char is positive
+	cmpb $'+', (%r8) # check if char is positive
 	jne cont1
-	movq 4(%rcx), %r8 # skip the + sign
+	incq %r8 # skip the + sign
+	incq %rsi
 
 
 cont1:
 	cmpq $-1, %r10
 	jne luup
-	movq 4(%rcx), %r8 # skip the - sign
+	incq %r8 # skip the - sign
+	incq %rsi
 
 
-.luup:
+luup:
 	# Check if it's a number.
 	# is the value between ascii 0 and 9
-	cmpq $'0', (%r8)
+	cmpb $'0', (%r8)
 	jl finluup
-	cmpq $'9', (%r8)
+	cmpb $'9', (%r8)
 	jg finluup
 
+	movzbq (%r8), %r9
 	# save number
-	subq $'0', (%r8) # convert from ascii to int
+	subq $48, %r9 # convert from ascii to int
 	imulq $10, %rdi # make space for new number in returnvalue
-	add %r8, %rdi # add to return value
+	add %r9, %rdi # add to return value
 
 
-	movq 4(%rcx), %r8 # get next char
+	incq %r8 # get next char
 	incq %rsi # increase bufInPos
 	jmp luup
-.finluup:
+finluup:
 
 imulq %r10, %rdi # make the value negative if specified
 
@@ -117,15 +113,15 @@ outImage:
 	movq bufOutPos, %rbx
 	movq MAXPOS, %rax
 	incq %rax
-resetBufLoop:
-	cmpq %rax, %rbx
-	je end
+#resetBufLoop:
+#	cmpq %rax, %rbx
+#	je endL
 
-	movb $0, bufOutPos(, %rbx, 1)
-	incq %rbx
-	jmp	resetBufLoop
-.end:
-	movq $0, bufOutPos
+#	movb $0, bufOutPos(, %rbx, 1)
+#	incq %rbx
+#	jmp	resetBufLoop
+#endL:
+#	movq $0, bufOutPos
 
 	ret
 
