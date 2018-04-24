@@ -88,6 +88,7 @@ finluup:
 
 imulq %r10, %rdi # make the value negative if specified
 
+incq %rsi # say you reed the first character that is not a number
 # update bufInPos
 movq %rsi, bufInPos
 
