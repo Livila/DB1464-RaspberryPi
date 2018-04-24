@@ -38,7 +38,7 @@ ret
 
 getInt:
 	#return val
-	mov $0, %rdi
+	mov $0, %rax
 
 	leaq bufIn, %r8 # load buf
 	movq bufInPos, %r9 # get bufinPos
@@ -63,7 +63,7 @@ cont1:
 	cmpq $-1, %r10
 	jne luup
 	incq %r8 # skip the - sign
-	incq %rsi
+	incq %rsi  
 
 
 luup:
@@ -77,8 +77,8 @@ luup:
 	movzbq (%r8), %r9
 	# save number
 	subq $48, %r9 # convert from ascii to int
-	imulq $10, %rdi # make space for new number in returnvalue
-	add %r9, %rdi # add to return value
+	imulq $10, %rax # make space for new number in returnvalue
+	add %r9, %rax # add to return value
 
 
 	incq %r8 # get next char
@@ -86,7 +86,7 @@ luup:
 	jmp luup
 finluup:
 
-imulq %r10, %rdi # make the value negative if specified
+imulq %r10, %rax # make the value negative if specified
 
 incq %rsi # say you reed the first character that is not a number
 # update bufInPos
@@ -128,12 +128,24 @@ outImage:
 #get int in rdi and put on outBuf and update pos
 putInt:
 	#convert int to ascii
-	addq $48, %rdi
+	#get the lasyt char by dividing with 10 and get the rest
+
+	#	divq S D
+	#		Unsigned divide S/D
+	#		Quotient stored in %rax
+	#		Remainder Stored in %rdx
+
+	
+	#devide rdi by 10
+
+	#if  Quotient == 0 jump to end
+	# put Quotient in rdi
+	#save Quotient as char
 
 	movq bufOut, %r8
 	addq bufOutPos, %r8
-	movq %rdi, (%r8)
-
+	movq %rdi, %r8
+	
 
 ret
 
