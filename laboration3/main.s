@@ -125,8 +125,16 @@ outImage:
 #	movq $0, bufOutPos
 
 	ret
-
+#get int in rdi and put on outBuf and update pos
 putInt:
+	#convert int to ascii
+	addq $48, %rdi
+
+	movq bufOut, %r8
+	addq bufOutPos, %r8
+	movq %rdi, (%r8)
+
+
 ret
 
 putText:
@@ -179,9 +187,11 @@ putChar:
 ret
 
 getOutPos:
+	movq bufOutPos, %rdi
 ret
 
 setOutPos:
+	movq %rdi, bufOutPos
 ret
 
 
