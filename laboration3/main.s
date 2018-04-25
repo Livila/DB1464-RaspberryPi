@@ -135,12 +135,37 @@ putInt:
 	#		Quotient stored in %rax
 	#		Remainder Stored in %rdx
 
-	
-	#devide rdi by 10
+	#how many times to pop
+	mov $0, %r8
+	#div with 10
+	mov $10, %r9
+
+	mov %rdi, %rax
+
+loopPutInt:
+	#devide rdx:rax by 10
+	mov $0, %rdx
+	 
+	divq %r9
+	#save remainder as char
+	add $48, %rdx # TODO test is this a char
+	push %rdx
+
+	#count up pop
+	incq %r8
 
 	#if  Quotient == 0 jump to end
-	# put Quotient in rdi
-	#save Quotient as char
+	cmpq $0, %rax
+	je endPutInt
+#TODO: smarer jmp
+	jmp loopPutInt
+
+endPutInt:
+
+#pop the latest char
+pop %r9
+#decrease r8
+#check if r8 == 0
 
 	movq bufOut, %r8
 	addq bufOutPos, %r8
