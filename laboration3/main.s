@@ -199,7 +199,7 @@ putChar:
 ret
 
 getOutPos:
-	movq bufOutPos, %rdi
+	movq bufOutPos, %rax
 ret
 
 setOutPos:
