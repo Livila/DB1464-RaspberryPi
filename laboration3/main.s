@@ -127,6 +127,7 @@ outImage:
 	ret
 #get int in rdi and put on outBuf and update pos
 putInt:
+push %rax, %r8, %r9, %rdx
 	#convert int to ascii
 	#get the lasyt char by dividing with 10 and get the rest
 
@@ -143,7 +144,7 @@ putInt:
 	mov %rdi, %rax
 
 loopPutInt:
-	#devide rdx:rax by 10
+	#divide rdx:rax by 10
 	mov $0, %rdx
 	 
 	divq %r9
@@ -157,25 +158,32 @@ loopPutInt:
 	#if  Quotient == 0 jump to end
 	cmpq $0, %rax
 	je endPutInt
-#TODO: smarer jmp
+#TODO: smarter jmp
 	jmp loopPutInt
 
 endPutInt:
 
 #pop the latest char
 pop %r9
+# add char to buf
+
 #decrease r8
+decq %r8
 #check if r8 == 0
+cmpq $0, %r8
+jne endPutInt
 
-	movq bufOut, %r8
-	addq bufOutPos, %r8
-	movq %rdi, %r8
-	
+	#movq bufOut, %r8
+	#addq bufOutPos, %r8
+	#movq %rdi, %r8
 
+
+pop %rax, %r8, %r9, %rdx
 ret
 
 putText:
 	
+push %rax, %rdx, %rbx
 
 
 
@@ -197,6 +205,7 @@ putTLoop:
 finT:
 	movq 	%rbx, bufOutPos
 
+pop %rax, %rdx, %rbx
 
 
 	
