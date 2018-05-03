@@ -110,24 +110,23 @@ outImage:
 	movq $bufOut, %rdi
 	call puts
 
-	movq $0, bufOutPos
+	#move bufOutPos to register
 	movq bufOutPos, %rbx
-	movq MAXPOS, %rax
-	incq %rax
-#resetBufLoop:
-#	cmpq %rax, %rbx
-#	je endL
 
-#	movb $0, bufOutPos(, %rbx, 1)
-#	incq %rbx
-#	jmp	resetBufLoop
-#endL:
-#	movq $0, bufOutPos
+	loopOutImage:
+
+	#move null to current regpos
+	movb $0, bufOut(, %rbx, 1)
+	#decrease regpos
+	decq %rbx
+	#check if smaller than 0
+	cmpq $0, %rbx
+	jg loopOutImage
+	movq $0, bufOutPos
 
 	ret
 #get int in rdi and put on outBuf and update pos
 putInt:
-push %rax, %r8, %r9, %rdx
 	#convert int to ascii
 	#get the lasyt char by dividing with 10 and get the rest
 
@@ -141,6 +140,9 @@ push %rax, %r8, %r9, %rdx
 	#div with 10
 	mov $10, %r9
 
+	#outbufPos
+	mov bufOutPos, %rbx
+
 	mov %rdi, %rax
 
 loopPutInt:
@@ -149,7 +151,6 @@ loopPutInt:
 	 
 	divq %r9
 	#save remainder as char
-	add $48, %rdx # TODO test is this a char
 	push %rdx
 
 	#count up pop
@@ -165,25 +166,34 @@ endPutInt:
 
 #pop the latest char
 pop %r9
-# add char to buf
 
+#convert to ascii
+addb $48, %r9b
+# add char to buf
+movb %r9b, bufOut(, %rbx, 1)
+#increase bufOutPos
+incq %rbx
 #decrease r8
 decq %r8
 #check if r8 == 0
 cmpq $0, %r8
 jne endPutInt
 
+#null terminated
+#movb $0, %r9b
+# add char to buf
+#movb %r9b, bufOut(, %rbx, 1)
+
+mov %rbx, bufOutPos
 	#movq bufOut, %r8
 	#addq bufOutPos, %r8
 	#movq %rdi, %r8
 
 
-pop %rax, %r8, %r9, %rdx
 ret
 
 putText:
 	
-push %rax, %rdx, %rbx
 
 
 
@@ -205,7 +215,6 @@ putTLoop:
 finT:
 	movq 	%rbx, bufOutPos
 
-pop %rax, %rdx, %rbx
 
 
 	
