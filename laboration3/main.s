@@ -239,6 +239,12 @@ finT:
 ret
 
 putChar:
+
+	movq bufOutPos, %rbx
+	movb %dil, bufOut(, %rbx, 1)
+	incq %rbx
+	movq %rbx, bufOutPos
+
 ret
 
 getOutPos:
