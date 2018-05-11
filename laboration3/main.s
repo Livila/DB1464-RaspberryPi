@@ -95,15 +95,42 @@ movq %rsi, bufInPos
 ret
 
 getText:
-ret
+ret	
 
+#TODO: not tested
 getChar:
+#get character fom inBuf
+	movq $bufOut, %rax
+# check if the character is 0
+	cmpq $0, %rax
+	je inImage
+	cmpq $0, %rax
+	je getChar
+#jump back to start if true and get a new char
+#return charactr
 ret
 
 getInPos:
+movq bufInPos, %rax
 ret
 
 setInPos:
+#check if lower than 0 and if set to zero
+cmp $0, %rdi
+jl setToZero
+#check if higher thn 64 and if set to 64
+cmp $64, %rdi
+jg setToMax
+
+setToZero:
+	movq $0, %rdi
+	jmp setInPosFin
+setToMax:
+	movq $64, %rdi
+
+setInPosFin:
+
+	movq %rdi, bufInPos
 ret
 
 outImage:
@@ -134,6 +161,17 @@ putInt:
 	#		Unsigned divide S/D
 	#		Quotient stored in %rax
 	#		Remainder Stored in %rdx
+
+cmp $0, %rdi
+jg notMinus
+movq $-1, %r11
+imulq %r11, %rdi
+jmp continuePutInt
+
+notMinus:
+movq $1, %r11
+
+continuePutInt:
 
 	#how many times to pop
 	mov $0, %r8
