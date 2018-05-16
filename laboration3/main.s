@@ -48,12 +48,12 @@ getInt:
 
 	movq $1, %r10 # positive
 
-	cmpb $'-', (%r8) # check if char are -
+	cmpq $'-', (%r8) # check if char are -
 	jne cont
 	movq $-1, %r10 # negative
 
 cont:
-	cmpb $'+', (%r8) # check if char is positive
+	cmpq $'+', (%r8) # check if char is positive
 	jne cont1
 	incq %r8 # skip the + sign
 	incq %rsi
