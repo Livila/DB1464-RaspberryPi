@@ -48,7 +48,7 @@ getInt:
 
 	movq $1, %r10 # positive
 
-	cmpq $'-', (%r8) # check if char are -
+	cmpb $45, (%r8) # check if char are -
 	jne cont
 	movq $-1, %r10 # negative
 
