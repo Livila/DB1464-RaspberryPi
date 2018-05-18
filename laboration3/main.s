@@ -61,12 +61,22 @@ cont:
 
 cont1:
 	cmpq $-1, %r10
-	jne luup
+	jne luuup
 	incq %r8 # skip the - sign
 	incq %rsi  
 
 
+#check if it is  space before
+luuup:
+	cmpb $' ', (%r8)
+	jne luup
+	incq %r8 # get next char
+	incq %rsi # increase bufInPos
+	jmp luuup
+
 luup:
+
+	
 	# Check if it's a number.
 	# is the value between ascii 0 and 9
 	cmpb $'0', (%r8)
@@ -79,7 +89,6 @@ luup:
 	subq $48, %r9 # convert from ascii to int
 	imulq $10, %rax # make space for new number in returnvalue
 	add %r9, %rax # add to return value
-
 
 	incq %r8 # get next char
 	incq %rsi # increase bufInPos
