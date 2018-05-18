@@ -48,12 +48,12 @@ getInt:
 
 	movq $1, %r10 # positive
 
-	cmpb $45, (%r8) # check if char are -
+	cmpb $45, (%r8, 1) # check if char are -
 	jne cont
 	movq $-1, %r10 # negative
 
 cont:
-	cmpq $'+', (%r8) # check if char is positive
+	cmpb	 $43, (%r8, 1) # check if char is positive
 	jne cont1
 	incq %r8 # skip the + sign
 	incq %rsi
@@ -97,7 +97,7 @@ finluup:
 
 imulq %r10, %rax # make the value negative if specified
 
-incq %rsi # say you reed the first character that is not a number
+# incq %rsi # say you reed the first character that is not a number
 # update bufInPos
 movq %rsi, bufInPos
 
