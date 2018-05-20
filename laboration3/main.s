@@ -42,7 +42,7 @@ getInt:
 
 	leaq bufIn, %r8 # load buf
 	movq bufInPos, %r9 # get bufinPos
-	movq bufInPos, %rsi # get bufinPos
+	movq bufInPos, %r12 # get bufinPos
 
 	addq %r9, %r8
 
@@ -56,22 +56,37 @@ cont:
 	cmpb	 $43, (%r8, 1) # check if char is positive
 	jne cont1
 	incq %r8 # skip the + sign
-	incq %rsi
+	incq %r12
 
 
 cont1:
 	cmpq $-1, %r10
-	jne luuup
+	jne checkIfAtEndAndCallInImage
 	incq %r8 # skip the - sign
-	incq %rsi  
+	incq %r12  
 
+#check if the string is to short
+checkIfAtEndAndCallInImage:
+#check if r8 = \n
+	cmpq $10, (%r8, 1)
+	jne luuuup
+
+	call inImage
+	jmp getInt
+	
+# check if it is at the end of the buffert
+luuuup:
+	cmpq $64, %r9
+	jne luuup
+	call inImage
+	jmp getInt
 
 #check if it is  space before
 luuup:
 	cmpb $' ', (%r8)
 	jne luup
 	incq %r8 # get next char
-	incq %rsi # increase bufInPos
+	incq %r12 # increase bufInPos
 	jmp luuup
 
 luup:
@@ -91,15 +106,17 @@ luup:
 	add %r9, %rax # add to return value
 
 	incq %r8 # get next char
-	incq %rsi # increase bufInPos
+	incq %r12 # increase bufInPos
 	jmp luup
 finluup:
+
+# update bufInPos
+movq %r12, bufInPos
 
 imulq %r10, %rax # make the value negative if specified
 
 # incq %rsi # say you reed the first character that is not a number
-# update bufInPos
-movq %rsi, bufInPos
+
 
 ret
 
