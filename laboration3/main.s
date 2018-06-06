@@ -48,6 +48,15 @@ getInt:
 
 	movq $1, %r10 # positive
 
+#check if it is  space before
+checkIfSpace:
+	cmpb $' ', (%r8)
+	jne endCheckIfSpace
+	incq %r8 # get next char
+	incq %r12 # increase bufInPos
+	jmp checkIfSpace
+endCheckIfSpace:
+
 	cmpb $45, (%r8, 1) # check if char are -
 	jne cont
 	movq $-1, %r10 # negative
@@ -81,13 +90,9 @@ luuuup:
 	call inImage
 	jmp getInt
 
-#check if it is  space before
+#check if it is  space before is done further up
 luuup:
-	cmpb $' ', (%r8)
-	jne luup
-	incq %r8 # get next char
-	incq %r12 # increase bufInPos
-	jmp luuup
+
 
 luup:
 
@@ -188,7 +193,7 @@ putInt:
 	#		Quotient stored in %rax
 	#		Remainder Stored in %rdx
 
-cmp $0, %rdi
+cmp $-1, %rdi
 jg notMinus
 movq $-1, %r11
 imulq %r11, %rdi
@@ -227,6 +232,13 @@ loopPutInt:
 	jmp loopPutInt
 
 endPutInt:
+
+#if it was minus input a '-' character
+cmpq $-1, %r11
+jne notMinusSigne
+movb $'-', bufOut(, %rbx, 1)
+incq %rbx
+notMinusSigne:
 
 #pop the latest char
 pop %r9
