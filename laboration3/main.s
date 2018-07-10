@@ -231,13 +231,15 @@ loopPutInt:
 #TODO: smarter jmp
 	jmp loopPutInt
 
-endPutInt:
 
+
+endPutInt:
 #if it was minus input a '-' character
 	cmpq $-1, %r11
 	jne notMinusSigne
 	movb $'-', bufOut(, %rbx, 1)
 	incq %rbx
+
 notMinusSigne:
 
 
@@ -249,7 +251,7 @@ notMinusSigne:
 	decq %r8		#decrease amount of times to pop
 
 	cmpq $0, %r8		#check if r8 == 0
-	jne endPutInt		#continue pop if r8 != 0
+	jne notMinusSigne	#continue pop if r8 != 0
 
 
 
