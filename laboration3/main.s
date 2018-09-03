@@ -130,8 +130,40 @@ ret
 #ret: antal överförda teckan till buf
 getText:
 
+mov %rdi, %r10
 
+#deffine counter (rax)
+	mov $0, %rax
+#get bufInPos
+	leaq bufIn, %r8		# get bufIn
+	movq bufInPos, %r9 	# get bufinPos
 
+#get character on bufInPos
+	addq %r9, %r8		#get the first character
+
+#if bufIn is empty call inImage and go to getText
+	cmpq $10, (%r8, 1) #check if new line
+	je getMoreChar
+	cmpq $0, (%r8, 1) #check if it is a 0
+	je getMoreChar
+	jmp getOneChar
+
+getMoreChar:
+	call inImage
+	call getText
+
+getOneChar:
+#get character on bufInPos
+	movzbq (%r8), %r12
+#increase bufInPos
+	incq %r8
+#insert character on the position counter (rax) have
+	movb 	%r12b, 0x0(%r10) # save character
+	incq	%r10
+#increase counter (rax)
+	incq %rax
+#if not at end or sounter = n go to getOneChar
+#return counter (rax)
 
 
 
@@ -139,17 +171,17 @@ getText:
 
 
 	#test (working)
-	movb 	$73, 0x0(%rdi) # save character to rdi
-	movb 	$32, 0x1(%rdi) # save character to rdi
-	movb 	$60, 0x2(%rdi) # save character to rdi
-	movb	$51, 0x3(%rdi) # save character to rdi
-	movb 	$32, 0x4(%rdi) # save character to rdi
-	movb 	$66, 0x5(%rdi) # save character to rdi
-	movb 	$84, 0x6(%rdi) # save character to rdi
-	movb 	$72, 0x7(%rdi) # save character to rdi
-	movb	$0, 0x8(%rdi) #end string with 0
+	#movb 	$73, 0x0(%rdi) # save character to rdi
+	#movb 	$32, 0x1(%rdi) # save character to rdi
+	#movb 	$60, 0x2(%rdi) # save character to rdi
+	#movb	$51, 0x3(%rdi) # save character to rdi
+	#movb 	$32, 0x4(%rdi) # save character to rdi
+	#movb 	$66, 0x5(%rdi) # save character to rdi
+	#movb 	$84, 0x6(%rdi) # save character to rdi
+	#movb 	$72, 0x7(%rdi) # save character to rdi
+	#movb	$0, 0x8(%rdi) #end string with 0
 
-	mov 	$9, %rax #we saved 9 characters
+	#mov 	$9, %rax #we saved 9 characters
 
 	
 
