@@ -125,8 +125,8 @@ imulq %r10, %rax # make the value negative if specified
 
 ret
 
-#param1: adsress til minnesutrymme att kopiera sträng till från inmatningsbufferten (buf i texen)
-#param2: maximalt antal tecken att läsa från inamtningsbufferten (n i tecken)
+#param1 (rdi): adsress til minnesutrymme att kopiera sträng till från inmatningsbufferten (buf i texen)
+#param2 (rsi): maximalt antal tecken att läsa från inamtningsbufferten (n i tecken)
 #ret: antal överförda teckan till buf
 getText:
 
@@ -149,7 +149,9 @@ mov %rdi, %r10
 	jmp getOneChar
 
 getMoreChar:
+push %rdi
 	call inImage
+pop %rdi
 	call getText
 
 getOneChar:
@@ -162,7 +164,14 @@ getOneChar:
 	incq	%r10
 #increase counter (rax)
 	incq %rax
-#if not at end or sounter = n go to getOneChar
+#if not at end or counter = n go to getOneChar
+	cmpq $0, (%r8, 1) #check if it is a 0
+	je returnGetText
+	cmpq %rax, %rsi
+	je returnGetText
+	jmp getOneChar
+
+returnGetText:
 #return counter (rax)
 
 
