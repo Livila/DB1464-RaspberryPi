@@ -125,7 +125,40 @@ imulq %r10, %rax # make the value negative if specified
 
 ret
 
+#param1: adsress til minnesutrymme att kopiera sträng till från inmatningsbufferten (buf i texen)
+#param2: maximalt antal tecken att läsa från inamtningsbufferten (n i tecken)
+#ret: antal överförda teckan till buf
 getText:
+
+
+
+
+
+
+
+
+
+	#test (working)
+	movb 	$73, 0x0(%rdi) # save character to rdi
+	movb 	$32, 0x1(%rdi) # save character to rdi
+	movb 	$60, 0x2(%rdi) # save character to rdi
+	movb	$51, 0x3(%rdi) # save character to rdi
+	movb 	$32, 0x4(%rdi) # save character to rdi
+	movb 	$66, 0x5(%rdi) # save character to rdi
+	movb 	$84, 0x6(%rdi) # save character to rdi
+	movb 	$72, 0x7(%rdi) # save character to rdi
+	movb	$0, 0x8(%rdi) #end string with 0
+
+	mov 	$9, %rax #we saved 9 characters
+
+	
+
+
+
+
+
+
+
 ret	
 
 #TODO: not tested
