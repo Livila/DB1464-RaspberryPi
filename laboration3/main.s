@@ -48,6 +48,9 @@ getInt:
 
 	movq $1, %r10		#assume it is positive (the end value will be multiplied with this value)
 
+	cmpb $45, (%r8, 1)	# check if char are '-'
+je endCheckIfSpace
+
 #check if it is  space before character
 checkIfSpace:
 	cmpb $' ', (%r8) 	# is the current character a space
@@ -92,6 +95,7 @@ luuuup:
 
 #check if it is  space before is done further up
 luuup:
+
 
 
 luup:
@@ -202,7 +206,7 @@ returnGetText:
 
 ret	
 
-#TODO: not tested
+
 getChar:
 #get character fom inBuf
 	movq $bufOut, %rax
@@ -212,7 +216,7 @@ getChar:
 	cmpq $0, %rax
 	je getChar
 #jump back to start if true and get a new char
-#return charactr
+#return charactr    
 ret
 
 getInPos:
